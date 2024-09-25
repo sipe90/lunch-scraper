@@ -1,1 +1,1 @@
-rootProject.name = "com.github.sipe90.jake-lunch-server"
+rootProject.name = "com.github.sipe90.jake-lunch"

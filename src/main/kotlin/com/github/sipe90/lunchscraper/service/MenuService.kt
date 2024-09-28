@@ -1,8 +1,8 @@
-package com.github.sipe90.jakelunch.service
+package com.github.sipe90.lunchscraper.service
 
-import com.github.sipe90.jakelunch.domain.MenuItem
-import com.github.sipe90.jakelunch.domain.Venue
-import com.github.sipe90.jakelunch.domain.WeekMenus
+import com.github.sipe90.lunchscraper.domain.MenuItem
+import com.github.sipe90.lunchscraper.domain.Venue
+import com.github.sipe90.lunchscraper.domain.WeekMenus
 import org.springframework.stereotype.Service
 
 @Service

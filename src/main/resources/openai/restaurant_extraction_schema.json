@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "restaurant": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Extracted restaurant information. Can be null if extraction was not successful",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "website_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "address",
+        "website_url"
+      ]
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Any errors occurred during data extraction as freeform text"
+    }
+  },
+  "required": [
+    "restaurant",
+    "errors"
+  ]
+}

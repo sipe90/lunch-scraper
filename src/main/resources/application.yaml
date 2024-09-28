@@ -1,6 +1,11 @@
 ktor:
     application:
         modules:
-            - com.github.sipe90.jakelunch.JakeLunchApplicationKt.module
+            - com.github.sipe90.lunchscraper.LunchScraperApplicationKt.module
     deployment:
         port: 8080
+lunch-scraper:
+    open-ai:
+        model: "gpt-4o"
+        base-url: "https://api.openai.com/v1/"
+        api-key: ""

@@ -1,4 +1,4 @@
-package com.github.sipe90.jakelunch.plugins
+package com.github.sipe90.lunchscraper.plugins
 
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application

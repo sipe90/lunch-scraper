@@ -1,4 +1,4 @@
-package com.github.sipe90.jakelunch.domain
+package com.github.sipe90.lunchscraper.domain
 
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable

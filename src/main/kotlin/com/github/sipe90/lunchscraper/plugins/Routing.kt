@@ -1,6 +1,7 @@
-package com.github.sipe90.jakelunch.plugins
+package com.github.sipe90.lunchscraper.plugins
 
-import com.github.sipe90.jakelunch.service.MenuService
+import com.github.sipe90.lunchscraper.service.MenuService
+import com.github.sipe90.lunchscraper.service.ScrapeService
 import io.ktor.server.application.Application
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
@@ -12,6 +13,11 @@ fun Application.configureRouting() {
             val menuService = springContext.getBean(MenuService::class.java)
 
             call.respond(menuService.getMenus())
+        }
+
+        get("/test") {
+            val scrapeService = springContext.getBean(ScrapeService::class.java)
+            call.respond(scrapeService.scrape())
         }
     }
 }

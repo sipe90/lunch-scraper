@@ -1,0 +1,178 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "lunch_menus": {
+      "type": "object",
+      "properties": {
+        "lunchtime_start": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Lunchtime start time in format HH:mm"
+        },
+        "lunchtime_end": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Lunchtime end time in format HH:mm"
+        },
+        "daily_menus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "menu_type": {
+                "$ref":"#/definitions/menu_type"
+              },
+              "monday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              },
+              "tuesday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              },
+              "wednesday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              },
+              "thursday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              },
+              "friday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              },
+              "saturday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              },
+              "sunday": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/menu_item"
+                }
+              }
+            },
+            "required": [
+              "menu_type",
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "weekly_menu": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "menu_type": {
+              "$ref":"#/definitions/menu_type"
+            },
+            "items": {
+              "$ref": "#/definitions/menu_item"
+            }
+          },
+          "required": [
+            "menu_type",
+            "items"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "daily_menus",
+        "weekly_menu",
+        "lunchtime_start",
+        "lunchtime_end"
+      ],
+      "additionalProperties": false
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Any errors occurred during data extraction as freeform text"
+    }
+  },
+  "required": [
+    "lunch_menus",
+    "errors"
+  ],
+  "definitions": {
+    "menu_type": {
+      "type": "string",
+      "enum": [
+        "buffet",
+        "a_la_carte"
+      ]
+    },
+    "menu_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the menu item. Exclude all extra information like allergens."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the menu item. Exclude all extra information like allergens."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the menu item."
+        },
+        "diets": {
+          "type": "array",
+          "description": "Diets and allergens related to the menu item.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "vegetarian",
+              "vegan",
+              "low_lactose",
+              "gluten_free",
+              "lactose_free",
+              "dairy_free",
+              "nut_free"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "price",
+        "diets"
+      ]
+    }
+  }
+}

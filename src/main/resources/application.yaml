@@ -5,6 +5,8 @@ ktor:
   deployment:
     port: 8080
 lunch-scraper:
+  api:
+    api-key: ""
   open-ai:
     model: "gpt-4o-mini"
     # model: "gpt-4o-2024-08-06"
@@ -18,7 +20,6 @@ lunch-scraper:
       Follow instructions in schema description properties. Ignore past week menus.
       If no valid menu for this week is found, output an appropriate error message.
     user-prompt-prefix: >-
-      Current week is week number 40. Language is in Finnish.
       Extract information from the following cleaned HTML document and focus on menus for the current week.
       Skip menus for previous or future weeks.
     save-document: false

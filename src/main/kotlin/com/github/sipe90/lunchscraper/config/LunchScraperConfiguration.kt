@@ -5,6 +5,9 @@ import io.ktor.server.config.ApplicationConfig
 class LunchScraperConfiguration(
     private val applicationConfig: ApplicationConfig,
 ) {
+    val apiConfig: ApiConfig
+        get() = ApiConfig(applicationConfig.config("api"))
+
     val openAiConfig: OpenAIConfig
         get() = OpenAIConfig(applicationConfig.config("open-ai"))
 
@@ -17,6 +20,13 @@ class LunchScraperConfiguration(
                 .configList("locations")
                 .map { LocationConfig(it) }
                 .associateBy { it.id }
+}
+
+class ApiConfig(
+    private val config: ApplicationConfig,
+) {
+    val apiKey: String
+        get() = config.property("api-key").getString()
 }
 
 class OpenAIConfig(

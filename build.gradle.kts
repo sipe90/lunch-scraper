@@ -37,6 +37,7 @@ dependencies {
     // Ktor Server
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-auth-jvm")
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")

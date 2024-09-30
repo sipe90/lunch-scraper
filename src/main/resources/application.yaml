@@ -1,11 +1,64 @@
 ktor:
-    application:
-        modules:
-            - com.github.sipe90.lunchscraper.LunchScraperApplicationKt.module
-    deployment:
-        port: 8080
+  application:
+    modules:
+      - com.github.sipe90.lunchscraper.LunchScraperApplicationKt.module
+  deployment:
+    port: 8080
 lunch-scraper:
-    open-ai:
-        model: "gpt-4o"
-        base-url: "https://api.openai.com/v1/"
-        api-key: ""
+  open-ai:
+    model: "gpt-4o-mini"
+    # model: "gpt-4o-2024-08-06"
+    base-url: "https://api.openai.com/v1/"
+    api-key: ""
+  scraping:
+    system-prompt: >-
+      Process HTML documents of a restaurant's website and extract the weekly lunch menus into a JSON response
+      in the same language that was used in the website.
+      Only extract data if the menus are for the specified week.
+      Follow instructions in schema description properties. Ignore past week menus.
+      If no valid menu for this week is found, output an appropriate error message.
+    user-prompt-prefix: >-
+      Current week is week number 40. Language is in Finnish.
+      Extract information from the following cleaned HTML document and focus on menus for the current week.
+      Skip menus for previous or future weeks.
+    save-document: false
+  locations:
+    - id: "jarvenpaa"
+      name: "Järvenpää"
+      restaurants:
+        - id: "bistro"
+          name: "Bistro En Place"
+          urls:
+            - "https://www.bistroenplace.fi/"
+        - id: "bumma"
+          name: "Bumma"
+          urls:
+            - "https://bumma.fi/lounas"
+        - id: "zapata"
+          name: "Cantina Viva Zapata"
+          urls:
+            - "https://cantinazapata.com/lounas/"
+        - id: "foodandco"
+          name: "Food & Co Järvenpää-talo"
+          urls:
+            - "https://www.compass-group.fi/ravintolat-ja-ruokalistat/foodco/kaupungit/jarvenpaa/jarvenpaa-talo/"
+        - id: "huili"
+          name: "Huili"
+          urls:
+            - "https://www.ravintolahuili.fi/lounas"
+        - id: "huvila"
+          name: "Huvila"
+          urls:
+            - "https://www.huvilassa.fi/lounas"
+        - id: "karuwa"
+          name: "Karuwa"
+          urls:
+            - "https://www.karuwa.fi/buffet.html"
+        - id: "pikkubuddha"
+          name: "Pikku Buddha"
+          urls:
+            - "https://www.ravintolapikkubuddha.com/lounas/maanantai"
+            - "https://www.ravintolapikkubuddha.com/lounas/tiistai"
+            - "https://www.ravintolapikkubuddha.com/lounas/keskiviikko"
+            - "https://www.ravintolapikkubuddha.com/lounas/torstai"
+            - "https://www.ravintolapikkubuddha.com/lounas/perjantai"

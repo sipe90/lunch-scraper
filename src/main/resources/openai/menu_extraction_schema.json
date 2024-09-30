@@ -20,68 +20,69 @@
           "description": "Lunchtime end time in format HH:mm"
         },
         "daily_menus": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "menu_type": {
-                "$ref":"#/definitions/menu_type"
-              },
-              "monday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
-              },
-              "tuesday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
-              },
-              "wednesday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
-              },
-              "thursday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
-              },
-              "friday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
-              },
-              "saturday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
-              },
-              "sunday": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/menu_item"
-                }
+          "type": "object",
+          "properties": {
+            "menu_type": {
+              "$ref":"#/definitions/menu_type"
+            },
+            "buffet_price": {
+              "$ref":"#/definitions/buffet_price"
+            },
+            "monday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
               }
             },
-            "required": [
-              "menu_type",
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ],
-            "additionalProperties": false
-          }
+            "tuesday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
+              }
+            },
+            "wednesday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
+              }
+            },
+            "thursday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
+              }
+            },
+            "friday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
+              }
+            },
+            "saturday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
+              }
+            },
+            "sunday": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/menu_item"
+              }
+            }
+          },
+          "required": [
+            "menu_type",
+            "buffet_price",
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "additionalProperties": false
         },
         "weekly_menu": {
           "type": [
@@ -92,12 +93,16 @@
             "menu_type": {
               "$ref":"#/definitions/menu_type"
             },
+            "buffet_price": {
+              "$ref":"#/definitions/buffet_price"
+            },
             "items": {
               "$ref": "#/definitions/menu_item"
             }
           },
           "required": [
             "menu_type",
+            "buffet_price",
             "items"
           ],
           "additionalProperties": false
@@ -131,24 +136,34 @@
         "a_la_carte"
       ]
     },
+    "buffet_price": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Buffet price. Null if menu_type is not 'buffet'"
+    },
     "menu_item": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the menu item. Exclude all extra information like allergens."
+          "description": "Name of the menu item. Omit allergens from the string."
         },
         "description": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Description of the menu item. Exclude all extra information like allergens."
+          "description": "Description of the menu item. Omit allergens from the string."
         },
         "price": {
-          "type": "number",
-          "description": "Price of the menu item."
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Price of the menu item. Null if this is a buffet menu item."
         },
         "diets": {
           "type": "array",

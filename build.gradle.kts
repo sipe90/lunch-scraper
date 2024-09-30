@@ -52,7 +52,11 @@ dependencies {
     // DI
     implementation("org.springframework:spring-context:$springContextVersion")
 
+    // HTML Parsing
+    implementation("org.jsoup:jsoup:1.18.1")
+
     // Logging
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.4")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     // Test

@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.service
+package com.github.sipe90.lunchscraper.openai
 
 import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
 import com.github.sipe90.lunchscraper.openai.model.ChatCompletionRequestSystemMessage
@@ -9,6 +9,7 @@ import com.github.sipe90.lunchscraper.openai.model.CreateChatCompletionRequestRe
 import com.github.sipe90.lunchscraper.openai.model.CreateChatCompletionResponse
 import com.github.sipe90.lunchscraper.openai.model.Model
 import com.github.sipe90.lunchscraper.openai.model.ResponseFormatJsonSchemaJsonSchema
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -21,54 +22,52 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import org.springframework.stereotype.Service
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class OpenAIService(
     config: LunchScraperConfiguration,
 ) {
-    private val model = Model.fromString(config.openAiConfig.model)
-
-    private val httpClient: HttpClient =
-        HttpClient(CIO) {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 60000
-            }
-
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        encodeDefaults = true
-                        explicitNulls = false
-                        isLenient = true
-                        allowSpecialFloatingPointValues = true
-                        allowStructuredMapKeys = true
-                        prettyPrint = false
-                        useArrayPolymorphism = false
-                    },
-                )
-            }
-
-            expectSuccess = true
-
-            defaultRequest {
-                url(config.openAiConfig.baseUrl)
-                bearerAuth(config.openAiConfig.apiKey)
-            }
+    private val json =
+        Json {
+            encodeDefaults = true
+            explicitNulls = false
+            isLenient = true
+            allowSpecialFloatingPointValues = true
+            allowStructuredMapKeys = true
+            prettyPrint = true
+            useArrayPolymorphism = false
         }
+
+    private val baseUrl = config.openAiConfig.baseUrl
+    private val apiKey = config.openAiConfig.apiKey
+    private val model = Model.fromString(config.openAiConfig.model)
 
     suspend fun createCompletion(
         systemMessages: List<String>,
         userMessages: List<String>,
         schemaOptions: SchemaOptions,
     ): CreateChatCompletionResponse =
-        httpClient
-            .post("chat/completions") {
-                contentType(ContentType.Application.Json)
-                setBody(createRequestModel(systemMessages, userMessages, schemaOptions))
-            }.body()
+        createClient(baseUrl, apiKey).use {
+            val createChatCompletionRequest = createRequestModel(systemMessages, userMessages, schemaOptions)
+            logger.trace { "Sending chat completion request: ${json.encodeToString(createChatCompletionRequest) }" }
+
+            val responseBody =
+                it
+                    .post("chat/completions") {
+                        contentType(ContentType.Application.Json)
+                        setBody(createChatCompletionRequest)
+                    }.body<CreateChatCompletionResponse>()
+
+            logger.trace { "Received response for chat completion request: ${json.encodeToString(responseBody) }" }
+
+            responseBody
+        }
 
     private fun createRequestModel(
         systemMessages: List<String>,
@@ -92,6 +91,7 @@ class OpenAIService(
                             ),
                     )
                 },
+        temperature = 0.1F,
         responseFormat =
             CreateChatCompletionRequestResponseFormat(
                 type = CreateChatCompletionRequestResponseFormat.Type.JSON_SCHEMA,
@@ -104,6 +104,26 @@ class OpenAIService(
                     ),
             ),
     )
+
+    private fun createClient(
+        baseUrl: String,
+        apiKey: String,
+    ) = HttpClient(CIO) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 60000
+        }
+
+        install(ContentNegotiation) {
+            json(json)
+        }
+
+        expectSuccess = true
+
+        defaultRequest {
+            url(baseUrl)
+            bearerAuth(apiKey)
+        }
+    }
 
     data class SchemaOptions(
         val name: String,

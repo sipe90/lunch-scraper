@@ -28,30 +28,24 @@ class ScrapeService(
 
     private val locations = config.locations
 
-    suspend fun scrapeAllMenus() =
-        coroutineScope {
-            locations.values
-                .map {
-                    async { scrapeAllLocationMenus(it) }
-                }.awaitAll()
-        }
+    suspend fun scrapeAllMenus() {
+        locations.values.map { scrapeAllLocationMenus(it).awaitAll() }
+    }
 
-    suspend fun scrapeAllLocationMenus(locationId: String): Unit =
-        coroutineScope {
-            val location = locations[locationId] ?: return@coroutineScope
-            scrapeAllLocationMenus(location).awaitAll()
-        }
+    suspend fun scrapeAllLocationMenus(locationId: String) {
+        val location = locations[locationId] ?: return
+        scrapeAllLocationMenus(location).awaitAll()
+    }
 
     suspend fun scrapeRestaurantMenus(
         locationId: String,
         restaurantId: String,
-    ): Unit =
-        coroutineScope {
-            val location = locations[locationId] ?: return@coroutineScope
-            val restaurant = location.restaurants[restaurantId] ?: return@coroutineScope
+    ) {
+        val location = locations[locationId] ?: return
+        val restaurant = location.restaurants[restaurantId] ?: return
 
-            scrapeRestaurantMenus(location, restaurant)
-        }
+        scrapeRestaurantMenus(location, restaurant)
+    }
 
     private suspend fun scrapeAllLocationMenus(location: LocationConfig) =
         coroutineScope {
@@ -81,9 +75,14 @@ class ScrapeService(
         val cleanedDocs = htmlDocs.joinToString("\n")
         val documentHash = cleanedDocs.md5()
 
-        if (existingScrapeResult?.documentHash == documentHash) {
-            logger.info { "Skipping extraction for ${restaurant.id} since document hash matches with previous scrape result hash" }
-            return@coroutineScope
+        if (existingScrapeResult != null) {
+            if (existingScrapeResult.documentHash == documentHash) {
+                logger.info { "Skipping extraction for ${restaurant.id} since document hash matches with previous scrape result hash" }
+                return@coroutineScope
+            }
+            logger.info { "Document hash changed from previous scrape for ${restaurant.id}. Proceeding with scrape." }
+        } else {
+            logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
         }
 
         val extractionResult = extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint)

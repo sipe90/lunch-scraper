@@ -19,7 +19,7 @@ group = "com.github.sipe90"
 version = "0.0.1"
 
 kotlin {
-    jvmToolchain(20)
+    jvmToolchain(21)
 }
 
 application {
@@ -31,6 +31,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -52,6 +53,10 @@ dependencies {
 
     // DI
     implementation("org.springframework:spring-context:$springContextVersion")
+
+    // Task scheduling
+    implementation("com.github.Pool-Of-Tears:KtScheduler:1.1.6")
+    implementation("com.cronutils:cron-utils:9.2.1")
 
     // HTML Parsing
     implementation("org.jsoup:jsoup:1.18.1")

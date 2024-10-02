@@ -11,6 +11,9 @@ class LunchScraperConfiguration(
     val openAiConfig: OpenAIConfig
         get() = OpenAIConfig(applicationConfig.config("open-ai"))
 
+    val schedulerConfig: SchedulerConfig
+        get() = SchedulerConfig(applicationConfig.config("scheduler"))
+
     val scrapingConfig: ScrapingConfig
         get() = ScrapingConfig(applicationConfig.config("scraping"))
 
@@ -40,6 +43,16 @@ class OpenAIConfig(
 
     val apiKey: String
         get() = applicationConfig.property("api-key").getString()
+}
+
+class SchedulerConfig(
+    private val config: ApplicationConfig,
+) {
+    val enabled: Boolean
+        get() = config.property("enabled").getString().toBoolean()
+
+    val cron: String
+        get() = config.property("cron").getString()
 }
 
 class ScrapingConfig(

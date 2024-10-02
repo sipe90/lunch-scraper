@@ -2,6 +2,7 @@ package com.github.sipe90.lunchscraper.plugins
 
 import com.github.sipe90.lunchscraper.scraping.ScrapeService
 import com.github.sipe90.lunchscraper.service.MenuService
+import com.github.sipe90.lunchscraper.tasks.ScrapeScheduler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -44,6 +45,20 @@ fun Application.configureRouting() {
 
         route("/admin") {
             authenticate {
+                route("/scheduler") {
+                    post("/pause") {
+                        val scrapeScheduler = springContext.getBean(ScrapeScheduler::class.java)
+                        scrapeScheduler.pause()
+                        call.respond(HttpStatusCode.OK)
+                    }
+
+                    post("/resume") {
+                        val scrapeScheduler = springContext.getBean(ScrapeScheduler::class.java)
+                        scrapeScheduler.resume()
+                        call.respond(HttpStatusCode.OK)
+                    }
+                }
+
                 route("/scrape") {
                     post {
                         val scrapeService = springContext.getBean(ScrapeService::class.java)

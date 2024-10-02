@@ -42,6 +42,7 @@ class OpenAIService(
             allowStructuredMapKeys = true
             prettyPrint = true
             useArrayPolymorphism = false
+            ignoreUnknownKeys = true
         }
 
     private val baseUrl = config.openAiConfig.baseUrl

@@ -1,8 +1,10 @@
 package com.github.sipe90.lunchscraper.repository
 
 import com.github.sipe90.lunchscraper.domain.MenuScrapeResult
+import com.github.sipe90.lunchscraper.util.Utils
 import io.ktor.serialization.kotlinx.json.DefaultJson
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Repository
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -12,7 +14,10 @@ import java.nio.file.Paths
  */
 @Repository
 class MenuRepository {
-    private val json = DefaultJson
+    private val json = Json(DefaultJson) {
+        prettyPrint = true
+    }
+
     private val saveFolder = "data"
 
     init {
@@ -29,8 +34,8 @@ class MenuRepository {
     }
 
     fun loadMenus(
-        year: Int,
-        week: Int,
+        year: Int = Utils.getCurrentYear(),
+        week: Int = Utils.getCurrentWeek(),
         locationId: String,
         restaurantId: String,
     ): MenuScrapeResult? {
@@ -44,8 +49,8 @@ class MenuRepository {
     }
 
     fun loadAllMenus(
-        year: Int,
-        week: Int,
+        year: Int = Utils.getCurrentYear(),
+        week: Int = Utils.getCurrentWeek(),
         locationId: String,
     ): List<MenuScrapeResult> {
         createDirs(year, week, locationId)

@@ -40,7 +40,7 @@ class OpenAIService(
             isLenient = true
             allowSpecialFloatingPointValues = true
             allowStructuredMapKeys = true
-            prettyPrint = true
+            prettyPrint = logger.isTraceEnabled()
             useArrayPolymorphism = false
             ignoreUnknownKeys = true
         }

@@ -6,7 +6,8 @@ import com.github.sipe90.lunchscraper.config.RestaurantConfig
 import com.github.sipe90.lunchscraper.domain.MenuScrapeResult
 import com.github.sipe90.lunchscraper.html.DocumentCleaner
 import com.github.sipe90.lunchscraper.html.DocumentLoader
-import com.github.sipe90.lunchscraper.service.MenuService
+import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
+import com.github.sipe90.lunchscraper.repository.MenuRepository
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -14,6 +15,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalTime
 import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
@@ -22,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 class ScrapeService(
     config: LunchScraperConfiguration,
     private val extractionService: ExtractionService,
-    private val menuService: MenuService,
+    private val menuRepository: MenuRepository,
 ) {
     private val saveDocument = config.scrapingConfig.saveDocument
 
@@ -60,7 +62,7 @@ class ScrapeService(
     ) = coroutineScope {
         logger.info { "Scraping menus for restaurant ${restaurant.id}" }
 
-        val existingScrapeResult = menuService.getMenus(location.id, restaurant.id)
+        val existingScrapeResult = menuRepository.loadMenus(locationId = location.id, restaurantId = restaurant.id)
 
         val htmlDocs =
             restaurant.urls
@@ -85,7 +87,8 @@ class ScrapeService(
             logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
         }
 
-        val extractionResult = extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint)
+        val extractionResult =
+            validateExtractionResult(extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint))
 
         logger.info { "Finished scraping menus for restaurant ${restaurant.id}" }
 
@@ -101,6 +104,38 @@ class ScrapeService(
                 extractionResult = extractionResult,
             )
 
-        menuService.saveMenus(scrapeResult)
+        menuRepository.saveMenus(scrapeResult)
+    }
+
+    private fun validateExtractionResult(extractionResult: MenuExtractionResult): MenuExtractionResult {
+        // Since structured output's JSON schema does not (yet) support string format, we'll have to validate the start and end times.
+        // https://platform.openai.com/docs/guides/structured-outputs/some-type-specific-keywords-are-not-yet-supported
+        return extractionResult.copy(
+            lunchMenus =
+                extractionResult.lunchMenus.let { lunchMenus ->
+                    lunchMenus.copy(
+                        lunchtimeStart =
+                            lunchMenus.lunchtimeStart?.let { lunchtimeStart ->
+                                runCatching { LocalTime.parse(lunchtimeStart) }.fold(
+                                    onSuccess = { lunchtimeStart },
+                                    onFailure = {
+                                        logger.warn(it) { "Failed to parse lunch start time $lunchtimeStart" }
+                                        null
+                                    },
+                                )
+                            },
+                        lunchtimeEnd =
+                            lunchMenus.lunchtimeEnd?.let { lunchtimeEnd ->
+                                runCatching { LocalTime.parse(lunchtimeEnd) }.fold(
+                                    onSuccess = { lunchtimeEnd },
+                                    onFailure = {
+                                        logger.warn(it) { "Failed to parse lunch end time $lunchtimeEnd" }
+                                        null
+                                    },
+                                )
+                            },
+                    )
+                },
+        )
     }
 }

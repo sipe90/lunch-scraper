@@ -1,7 +1,7 @@
 package com.github.sipe90.lunchscraper.plugins
 
+import com.github.sipe90.lunchscraper.api.MenuService
 import com.github.sipe90.lunchscraper.scraping.ScrapeService
-import com.github.sipe90.lunchscraper.service.MenuService
 import com.github.sipe90.lunchscraper.tasks.ScrapeScheduler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode

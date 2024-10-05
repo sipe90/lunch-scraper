@@ -9,9 +9,11 @@ lunch-scraper:
     api-key: ""
   open-ai:
     model: "gpt-4o-mini"
-    # model: "gpt-4o-2024-08-06"
     base-url: "https://api.openai.com/v1/"
     api-key: ""
+  scheduler:
+    enabled: true
+    cron: "0 0 8-15 ? * * *"
   scraping:
     system-prompt: >-
       Process HTML documents of a restaurant's website and extract the weekly lunch menus into a JSON response
@@ -24,42 +26,10 @@ lunch-scraper:
       Skip menus for previous or future weeks.
     save-document: false
   locations:
-    - id: "jarvenpaa"
-      name: "Järvenpää"
+    - id: "some-city"
+      name: "Some City"
       restaurants:
-        - id: "bistro"
-          name: "Bistro En Place"
+        - id: "pizza-time"
+          name: "Pizza Time"
           urls:
-            - "https://www.bistroenplace.fi/"
-        - id: "bumma"
-          name: "Bumma"
-          urls:
-            - "https://bumma.fi/lounas"
-        - id: "zapata"
-          name: "Cantina Viva Zapata"
-          urls:
-            - "https://cantinazapata.com/lounas/"
-        - id: "foodandco"
-          name: "Food & Co Järvenpää-talo"
-          urls:
-            - "https://www.compass-group.fi/ravintolat-ja-ruokalistat/foodco/kaupungit/jarvenpaa/jarvenpaa-talo/"
-        - id: "huili"
-          name: "Huili"
-          urls:
-            - "https://www.ravintolahuili.fi/lounas"
-        - id: "huvila"
-          name: "Huvila"
-          urls:
-            - "https://www.huvilassa.fi/lounas"
-        - id: "karuwa"
-          name: "Karuwa"
-          urls:
-            - "https://www.karuwa.fi/buffet.html"
-        - id: "pikkubuddha"
-          name: "Pikku Buddha"
-          urls:
-            - "https://www.ravintolapikkubuddha.com/lounas/maanantai"
-            - "https://www.ravintolapikkubuddha.com/lounas/tiistai"
-            - "https://www.ravintolapikkubuddha.com/lounas/keskiviikko"
-            - "https://www.ravintolapikkubuddha.com/lounas/torstai"
-            - "https://www.ravintolapikkubuddha.com/lounas/perjantai"
+            - "https://pizza.time/lunch"

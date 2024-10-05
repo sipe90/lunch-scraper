@@ -1,0 +1,26 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="LunchScraperApplicationKt" type="KtorApplicationConfigurationType" factoryName="Ktor" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="com.github.sipe90.lunchscraper.LunchScraperApplicationKt" />
+    <module name="com.github.sipe90.lunch-scraper.main" />
+    <option name="PROGRAM_PARAMETERS" value="-config=application.yaml -config=application-dev.yaml" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.github.sipe90.lunchscraper.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="alternativeJrePath" />
+    <option name="alternativeJrePathEnabled" value="false" />
+    <option name="includeProvidedScope" value="false" />
+    <option name="mainClass" value="com.github.sipe90.lunchscraper.LunchScraperApplicationKt" />
+    <option name="passParentEnvs" value="true" />
+    <option name="programParameters" value="-config=application.yaml -config=application-dev.yaml" />
+    <option name="shortenCommandLine" />
+    <option name="vmParameters" />
+    <option name="workingDirectory" value="$ProjectFileDir$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

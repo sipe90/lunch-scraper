@@ -1,4 +1,5 @@
 import com.github.gradle.node.npm.task.NpxTask
+import io.ktor.plugin.features.DockerImageRegistry
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
@@ -12,11 +13,11 @@ plugins {
     kotlin("plugin.serialization") version "2.0.20"
     id("io.ktor.plugin") version "3.0.0-rc-1"
     id("com.github.node-gradle.node") version "7.0.2"
+    id("net.researchgate.release") version "3.0.2"
     id("org.jmailen.kotlinter") version "4.4.1"
 }
 
 group = "com.github.sipe90"
-version = "0.0.1"
 
 kotlin {
     jvmToolchain(21)
@@ -27,6 +28,25 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+ktor {
+    docker {
+        jreVersion.set(JavaVersion.VERSION_21)
+        localImageName.set(project.name)
+        imageTag.set(project.version.toString())
+        externalRegistry.set(
+            DockerImageRegistry.dockerHub(
+                appName = provider { project.name },
+                username = providers.environmentVariable("DOCKERHUB_USERNAME"),
+                password = providers.environmentVariable("DOCKERHUB_PASSWORD")
+            )
+        )
+    }
+}
+
+release {
+    tagTemplate.set("v\$version")
 }
 
 repositories {
@@ -130,3 +150,4 @@ sourceSets.main.configure {
 }
 
 tasks.getByName("compileKotlin").dependsOn("generateRestaurantExtractionModel", "generateMenuExtractionModel")
+tasks.getByName("afterReleaseBuild").dependsOn("publishImage")

@@ -107,7 +107,7 @@ class ScrapeService(
 
             menuRepository.saveMenus(scrapeResult)
         } catch (e: Exception) {
-            logger.error { "Exception thrown while trying to scrape menus for ${location.id}/${restaurant.id}" }
+            logger.error(e) { "Exception thrown while trying to scrape menus for ${location.id}/${restaurant.id}" }
         }
     }
 

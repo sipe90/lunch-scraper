@@ -34,7 +34,7 @@ class MenuService(
             return null
         }
 
-        return extractionResult.lunchMenus.let {
+        return extractionResult.lunchMenus!!.let {
             RestaurantMenus(
                 name = restaurantConfig.name,
                 location = null,

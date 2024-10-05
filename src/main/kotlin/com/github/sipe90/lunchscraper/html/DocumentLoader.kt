@@ -9,13 +9,12 @@ import org.jsoup.nodes.Document
 
 object DocumentLoader {
     suspend fun loadHtmlDocument(url: String): Document =
-        createClient().use {
+        useClient {
             val html = it.get(url).bodyAsText()
             Jsoup.parse(html)
         }
 
-    private fun createClient() =
-        HttpClient(CIO) {
-            expectSuccess = true
-        }
+    private suspend fun <T> useClient(block: suspend (httpClient: HttpClient) -> T) =
+        HttpClient(CIO) { expectSuccess = true }
+            .use { block(it) }
 }

@@ -25,11 +25,11 @@ lunch-scraper:
       Extract information from the following cleaned HTML document and focus on menus for the current week.
       Skip menus for previous or future weeks.
     save-document: false
-  locations:
-    - id: "some-city"
-      name: "Some City"
-      restaurants:
-        - id: "pizza-time"
-          name: "Pizza Time"
-          urls:
-            - "https://pizza.time/lunch"
+  locations: []
+    #- id: "some-city"
+    #  name: "Some City"
+    #  restaurants:
+    #    - id: "pizza-time"
+    #      name: "Pizza Time"
+    #      urls:
+    #        - "https://pizza.time/lunch"

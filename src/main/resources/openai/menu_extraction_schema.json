@@ -3,7 +3,11 @@
   "additionalProperties": false,
   "properties": {
     "lunch_menus": {
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Extracted lunch menus. Can be null if extraction failed. In that case, provide errors in the corresponding attribute.",
       "properties": {
         "lunchtime_start": {
           "type": [

@@ -60,54 +60,64 @@ class ScrapeService(
         location: LocationConfig,
         restaurant: RestaurantConfig,
     ) = coroutineScope {
-        logger.info { "Scraping menus for restaurant ${restaurant.id}" }
+        try {
+            logger.info { "Scraping menus for restaurant ${restaurant.id}" }
 
-        val existingScrapeResult = menuRepository.loadMenus(locationId = location.id, restaurantId = restaurant.id)
+            val existingScrapeResult = menuRepository.loadMenus(locationId = location.id, restaurantId = restaurant.id)
 
-        val htmlDocs =
-            restaurant.urls
-                .map {
-                    async {
-                        DocumentLoader.loadHtmlDocument(it).let {
-                            DocumentCleaner.cleanDocument(it)
+            val htmlDocs =
+                restaurant.urls
+                    .map {
+                        async {
+                            DocumentLoader.loadHtmlDocument(it).let {
+                                DocumentCleaner.cleanDocument(it)
+                            }
                         }
-                    }
-                }.awaitAll()
+                    }.awaitAll()
 
-        val cleanedDocs = htmlDocs.joinToString("\n")
-        val documentHash = cleanedDocs.md5()
+            val cleanedDocs = htmlDocs.joinToString("\n")
+            val documentHash = cleanedDocs.md5()
 
-        if (existingScrapeResult != null) {
-            if (existingScrapeResult.documentHash == documentHash) {
-                logger.info { "Skipping extraction for ${restaurant.id} since document hash matches with previous scrape result hash" }
-                return@coroutineScope
+            if (existingScrapeResult != null) {
+                if (existingScrapeResult.documentHash == documentHash) {
+                    logger.info { "Skipping extraction for ${restaurant.id} since document hash matches with previous scrape result hash" }
+                    return@coroutineScope
+                }
+                logger.info { "Document hash changed from previous scrape for ${restaurant.id}. Proceeding with scrape." }
+            } else {
+                logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
             }
-            logger.info { "Document hash changed from previous scrape for ${restaurant.id}. Proceeding with scrape." }
-        } else {
-            logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
+
+            val extractionResult =
+                validateExtractionResult(extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint))
+
+            logger.info { "Finished scraping menus for restaurant ${restaurant.id}" }
+
+            val scrapeResult =
+                MenuScrapeResult(
+                    year = Utils.getCurrentYear(),
+                    week = Utils.getCurrentWeek(),
+                    locationId = location.id,
+                    restaurantId = restaurant.id,
+                    document = if (saveDocument) cleanedDocs else null,
+                    documentHash = documentHash,
+                    scrapeTimestamp = Clock.System.now(),
+                    extractionResult = extractionResult,
+                )
+
+            menuRepository.saveMenus(scrapeResult)
+        } catch (e: Exception) {
+            logger.error { "Exception thrown while trying to scrape menus for ${location.id}/${restaurant.id}" }
         }
-
-        val extractionResult =
-            validateExtractionResult(extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint))
-
-        logger.info { "Finished scraping menus for restaurant ${restaurant.id}" }
-
-        val scrapeResult =
-            MenuScrapeResult(
-                year = Utils.getCurrentYear(),
-                week = Utils.getCurrentWeek(),
-                locationId = location.id,
-                restaurantId = restaurant.id,
-                document = if (saveDocument) cleanedDocs else null,
-                documentHash = documentHash,
-                scrapeTimestamp = Clock.System.now(),
-                extractionResult = extractionResult,
-            )
-
-        menuRepository.saveMenus(scrapeResult)
     }
 
     private fun validateExtractionResult(extractionResult: MenuExtractionResult): MenuExtractionResult {
+        if (extractionResult.errors.isNotEmpty()) {
+            throw IllegalStateException("Extraction failed. Model returned errors: ${extractionResult.errors}")
+        }
+        if (extractionResult.lunchMenus == null) {
+            throw IllegalStateException("Extraction failed. Model did not provide explanation")
+        }
         // Since structured output's JSON schema does not (yet) support string format, we'll have to validate the start and end times.
         // https://platform.openai.com/docs/guides/structured-outputs/some-type-specific-keywords-are-not-yet-supported
         return extractionResult.copy(

@@ -54,7 +54,7 @@ class OpenAIService(
         userMessages: List<String>,
         schemaOptions: SchemaOptions,
     ): CreateChatCompletionResponse =
-        createClient(baseUrl, apiKey).use {
+        useClient {
             val createChatCompletionRequest = createRequestModel(systemMessages, userMessages, schemaOptions)
             logger.trace { "Sending chat completion request: ${json.encodeToString(createChatCompletionRequest) }" }
 
@@ -106,25 +106,23 @@ class OpenAIService(
             ),
     )
 
-    private fun createClient(
-        baseUrl: String,
-        apiKey: String,
-    ) = HttpClient(CIO) {
-        install(HttpTimeout) {
-            requestTimeoutMillis = 60000
-        }
+    private suspend fun <T> useClient(block: suspend (httpClient: HttpClient) -> T) =
+        HttpClient(CIO) {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60000
+            }
 
-        install(ContentNegotiation) {
-            json(json)
-        }
+            install(ContentNegotiation) {
+                json(json)
+            }
 
-        expectSuccess = true
+            expectSuccess = true
 
-        defaultRequest {
-            url(baseUrl)
-            bearerAuth(apiKey)
-        }
-    }
+            defaultRequest {
+                url(baseUrl)
+                bearerAuth(apiKey)
+            }
+        }.use { block(it) }
 
     data class SchemaOptions(
         val name: String,

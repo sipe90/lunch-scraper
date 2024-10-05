@@ -14,9 +14,10 @@ import java.nio.file.Paths
  */
 @Repository
 class MenuRepository {
-    private val json = Json(DefaultJson) {
-        prettyPrint = true
-    }
+    private val json =
+        Json(DefaultJson) {
+            prettyPrint = true
+        }
 
     private val saveFolder = "data"
 

@@ -87,34 +87,10 @@
             "sunday"
           ],
           "additionalProperties": false
-        },
-        "weekly_menu": {
-          "type": [
-            "object",
-            "null"
-          ],
-          "properties": {
-            "menu_type": {
-              "$ref":"#/definitions/menu_type"
-            },
-            "buffet_price": {
-              "$ref":"#/definitions/buffet_price"
-            },
-            "items": {
-              "$ref": "#/definitions/menu_item"
-            }
-          },
-          "required": [
-            "menu_type",
-            "buffet_price",
-            "items"
-          ],
-          "additionalProperties": false
         }
       },
       "required": [
         "daily_menus",
-        "weekly_menu",
         "lunchtime_start",
         "lunchtime_end"
       ],

@@ -41,7 +41,6 @@ class MenuService(
                 lunchtimeStart = it.lunchtimeStart?.let(LocalTime::parse),
                 lunchtimeEnd = it.lunchtimeEnd?.let(LocalTime::parse),
                 dailyMenus = it.dailyMenus,
-                weeklyMenu = it.weeklyMenu,
             )
         }
     }

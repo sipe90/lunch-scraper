@@ -23,6 +23,7 @@ lunch-scraper:
       If no valid menu for this week is found, output an appropriate error message.
     user-prompt-prefix: >-
       Extract information from the following cleaned HTML document and focus on menus for the current week of {{week}}.
+      If the document contains menus for multiple restaurants, only extract menus for the restaurant named {{name}}.
     save-document: false
   locations: []
     #- id: "some-city"

@@ -7,7 +7,7 @@ import com.github.sipe90.lunchscraper.domain.MenuScrapeResult
 import com.github.sipe90.lunchscraper.html.DocumentCleaner
 import com.github.sipe90.lunchscraper.html.DocumentLoader
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.repository.MenuRepository
+import com.github.sipe90.lunchscraper.repository.ScrapeResultRepository
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -24,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 class ScrapeService(
     config: LunchScraperConfiguration,
     private val extractionService: ExtractionService,
-    private val menuRepository: MenuRepository,
+    private val scrapeResultRepository: ScrapeResultRepository,
 ) {
     private val saveDocument = config.scrapingConfig.saveDocument
 
@@ -63,7 +63,7 @@ class ScrapeService(
         try {
             logger.info { "Scraping menus for restaurant ${restaurant.id}" }
 
-            val existingScrapeResult = menuRepository.loadMenus(locationId = location.id, restaurantId = restaurant.id)
+            val existingScrapeResult = scrapeResultRepository.loadResult(locationId = location.id, restaurantId = restaurant.id)
 
             val htmlDocs =
                 restaurant.urls
@@ -88,24 +88,45 @@ class ScrapeService(
                 logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
             }
 
-            val extractionResult =
-                validateExtractionResult(extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint))
+            val params = mapOf("week" to Utils.getCurrentWeek().toString())
+            var extractionResult = extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint, params)
 
-            logger.info { "Finished scraping menus for restaurant ${restaurant.id}" }
+            try {
+                extractionResult = validateExtractionResult(extractionResult)
 
-            val scrapeResult =
-                MenuScrapeResult(
-                    year = Utils.getCurrentYear(),
-                    week = Utils.getCurrentWeek(),
-                    locationId = location.id,
-                    restaurantId = restaurant.id,
-                    document = if (saveDocument) cleanedDocs else null,
-                    documentHash = documentHash,
-                    scrapeTimestamp = Clock.System.now(),
-                    extractionResult = extractionResult,
-                )
+                logger.info { "Finished scraping menus for restaurant ${restaurant.id}" }
 
-            menuRepository.saveMenus(scrapeResult)
+                val scrapeResult =
+                    MenuScrapeResult(
+                        year = Utils.getCurrentYear(),
+                        week = Utils.getCurrentWeek(),
+                        success = true,
+                        locationId = location.id,
+                        restaurantId = restaurant.id,
+                        document = if (saveDocument) cleanedDocs else null,
+                        documentHash = documentHash,
+                        scrapeTimestamp = Clock.System.now(),
+                        extractionResult = extractionResult,
+                    )
+
+                scrapeResultRepository.saveResult(scrapeResult)
+            } catch (e: Exception) {
+                val scrapeResult =
+                    MenuScrapeResult(
+                        year = Utils.getCurrentYear(),
+                        week = Utils.getCurrentWeek(),
+                        success = false,
+                        locationId = location.id,
+                        restaurantId = restaurant.id,
+                        document = cleanedDocs,
+                        documentHash = documentHash,
+                        scrapeTimestamp = Clock.System.now(),
+                        extractionResult = extractionResult,
+                    )
+
+                scrapeResultRepository.saveResult(scrapeResult)
+                throw e
+            }
         } catch (e: Exception) {
             logger.error(e) { "Exception thrown while trying to scrape menus for ${location.id}/${restaurant.id}" }
         }

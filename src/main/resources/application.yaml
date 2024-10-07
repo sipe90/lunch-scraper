@@ -18,12 +18,11 @@ lunch-scraper:
     system-prompt: >-
       Process HTML documents of a restaurant's website and extract the weekly lunch menus into a JSON response
       in the same language that was used in the website.
-      Only extract data if the menus are for the specified week.
-      Follow instructions in schema description properties. Ignore past week menus.
+      Only extract data of the menus for the specified week. Ignore menus for all other weeks.
+      Follow instructions in schema description properties.
       If no valid menu for this week is found, output an appropriate error message.
     user-prompt-prefix: >-
-      Extract information from the following cleaned HTML document and focus on menus for the current week.
-      Skip menus for previous or future weeks.
+      Extract information from the following cleaned HTML document and focus on menus for the current week of {{week}}.
     save-document: false
   locations: []
     #- id: "some-city"

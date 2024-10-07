@@ -27,12 +27,14 @@ class ExtractionService(
     suspend fun extractMenusFromDocument(
         doc: String,
         hint: String?,
+        params: Map<String, String> = emptyMap(),
     ): MenuExtractionResult =
         coroutineScope {
+            val userPrompt = replacePlaceholders(userPromptPrefix, params) + " ${hint ?: ""} $doc"
             val response =
                 openAIService.createCompletion(
                     listOf(systemPrompt),
-                    listOf("$userPromptPrefix ${hint ?: ""} $doc"),
+                    listOf(userPrompt),
                     OpenAIService.SchemaOptions(
                         name = "weeks_lunch_menus",
                         description = "A restaurant's weekly lunch menus",
@@ -47,4 +49,15 @@ class ExtractionService(
 
             json.decodeFromString(responseMessage)
         }
+
+    private fun replacePlaceholders(
+        prompt: String,
+        params: Map<String, String>,
+    ): String {
+        val p = params.entries.fold(prompt) { p, (variable, value) -> p.replace("{{$variable}}", value) }
+        if (p.contains(Regex.fromLiteral("{{\\w*}}"))) {
+            throw IllegalArgumentException("Prompt contains undefined variables: $p")
+        }
+        return p
+    }
 }

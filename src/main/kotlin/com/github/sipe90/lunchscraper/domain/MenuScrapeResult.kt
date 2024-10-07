@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 data class MenuScrapeResult(
     val year: Int,
     val week: Int,
+    val success: Boolean,
     val locationId: String,
     val restaurantId: String,
     val document: String? = null,

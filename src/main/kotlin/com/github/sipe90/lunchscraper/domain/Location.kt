@@ -5,7 +5,13 @@ import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RestaurantMenus(
+data class Location(
+    val name: String,
+    val restaurants: List<Restaurant>,
+)
+
+@Serializable
+data class Restaurant(
     val name: String,
     val url: String,
     val location: String? = null,

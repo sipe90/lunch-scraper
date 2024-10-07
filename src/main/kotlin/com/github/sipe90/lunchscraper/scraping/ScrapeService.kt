@@ -88,10 +88,11 @@ class ScrapeService(
                 logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
             }
 
-            val params = mapOf(
-                "week" to Utils.getCurrentWeek().toString(),
-                "name" to restaurant.name,
-            )
+            val params =
+                mapOf(
+                    "week" to Utils.getCurrentWeek().toString(),
+                    "name" to restaurant.name,
+                )
             var extractionResult = extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint, params)
 
             try {

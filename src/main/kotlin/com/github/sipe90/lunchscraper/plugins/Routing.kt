@@ -25,21 +25,7 @@ fun Application.configureRouting() {
                 val menuService = springContext.getBean(MenuService::class.java)
                 val locationId = call.parameters.getOrFail("locationId")
 
-                val menus = menuService.getAllMenus(locationId)
-                if (menus == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(menus)
-                }
-            }
-
-            get("/{locationId}/{restaurantId}") {
-                val menuService = springContext.getBean(MenuService::class.java)
-                val locationId = call.parameters.getOrFail("locationId")
-                val restaurantId = call.parameters.getOrFail("restaurantId")
-
-                val menus = menuService.getMenus(locationId, restaurantId)
-
+                val menus = menuService.getLocationMenus(locationId)
                 if (menus == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {

@@ -1,8 +1,9 @@
 package com.github.sipe90.lunchscraper.api
 
 import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
+import com.github.sipe90.lunchscraper.domain.Location
 import com.github.sipe90.lunchscraper.domain.MenuScrapeResult
-import com.github.sipe90.lunchscraper.domain.RestaurantMenus
+import com.github.sipe90.lunchscraper.domain.Restaurant
 import com.github.sipe90.lunchscraper.repository.ScrapeResultRepository
 import com.github.sipe90.lunchscraper.util.Utils
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -16,35 +17,28 @@ class MenuService(
     config: LunchScraperConfiguration,
     private val scrapeResultRepository: ScrapeResultRepository,
 ) {
-    private val restaurantsByRestaurantIdByLocationId = config.locations.mapValues { (_, location) -> location.restaurants }
+    private val locations = config.locations
+    private val restaurantsByRestaurantIdByLocationId = locations.mapValues { (_, location) -> location.restaurants }
 
-    fun getAllMenus(locationId: String): List<RestaurantMenus>? {
-        val restaurants = restaurantsByRestaurantIdByLocationId[locationId]?.values ?: return null
+    fun getLocationMenus(locationId: String): Location? {
+        val location = locations[locationId] ?: return null
+        val restaurants = location.restaurants.values
+
         val results =
             scrapeResultRepository.loadAllResults(Utils.getCurrentYear(), Utils.getCurrentWeek(), locationId).associateBy {
                 it.restaurantId
             }
 
-        return restaurants.map {
-            results[it.id]?.toDto() ?: RestaurantMenus(name = it.name, url = it.urls.first())
-        }
+        return Location(
+            name = location.name,
+            restaurants =
+                restaurants.map {
+                    results[it.id]?.toDto() ?: Restaurant(name = it.name, url = it.urls.first())
+                },
+        )
     }
 
-    fun getMenus(
-        locationId: String,
-        restaurantId: String,
-    ): RestaurantMenus? {
-        val restaurant = restaurantsByRestaurantIdByLocationId[locationId]?.get(restaurantId) ?: return null
-        val result = scrapeResultRepository.loadResult(Utils.getCurrentYear(), Utils.getCurrentWeek(), locationId, restaurant.id)
-
-        return if (result != null) {
-            return result.toDto()
-        } else {
-            RestaurantMenus(name = restaurant.name, url = restaurant.urls.first())
-        }
-    }
-
-    private fun MenuScrapeResult.toDto(): RestaurantMenus? {
+    private fun MenuScrapeResult.toDto(): Restaurant? {
         val restaurantConfig = restaurantsByRestaurantIdByLocationId[locationId]?.get(restaurantId)
 
         if (restaurantConfig == null) {
@@ -53,7 +47,7 @@ class MenuService(
         }
 
         return extractionResult.lunchMenus!!.let {
-            RestaurantMenus(
+            Restaurant(
                 name = restaurantConfig.name,
                 url = restaurantConfig.urls.first(),
                 location = null,

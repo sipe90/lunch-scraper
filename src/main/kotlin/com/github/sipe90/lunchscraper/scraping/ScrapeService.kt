@@ -63,7 +63,7 @@ class ScrapeService(
         try {
             logger.info { "Scraping menus for restaurant ${restaurant.id}" }
 
-            val existingScrapeResult = scrapeResultRepository.loadResult(locationId = location.id, restaurantId = restaurant.id)
+            val previousExtractionResult = scrapeResultRepository.loadResult(locationId = location.id, restaurantId = restaurant.id)
 
             val htmlDocs =
                 restaurant.urls
@@ -78,8 +78,8 @@ class ScrapeService(
             val cleanedDocs = htmlDocs.joinToString("\n")
             val documentHash = cleanedDocs.md5()
 
-            if (existingScrapeResult != null) {
-                if (existingScrapeResult.documentHash == documentHash) {
+            if (previousExtractionResult != null) {
+                if (previousExtractionResult.documentHash == documentHash) {
                     logger.info { "Skipping extraction for ${restaurant.id} since document hash matches with previous scrape result hash" }
                     return@coroutineScope
                 }
@@ -96,7 +96,7 @@ class ScrapeService(
             var extractionResult = extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint, params)
 
             try {
-                extractionResult = validateExtractionResult(extractionResult)
+                extractionResult = validateExtractionResult(extractionResult, previousExtractionResult?.extractionResult)
 
                 logger.info { "Finished scraping menus for restaurant ${restaurant.id}" }
 
@@ -136,19 +136,23 @@ class ScrapeService(
         }
     }
 
-    private fun validateExtractionResult(extractionResult: MenuExtractionResult): MenuExtractionResult {
+    private fun validateExtractionResult(
+        extractionResult: MenuExtractionResult,
+        previousExtractionResult: MenuExtractionResult?,
+    ): MenuExtractionResult {
         if (extractionResult.errors.isNotEmpty()) {
             throw IllegalStateException("Extraction failed. Model returned errors: ${extractionResult.errors}")
         }
         if (extractionResult.lunchMenus == null) {
             throw IllegalStateException("Extraction failed. Model did not provide explanation")
         }
-        // Since structured output's JSON schema does not (yet) support string format, we'll have to validate the start and end times.
-        // https://platform.openai.com/docs/guides/structured-outputs/some-type-specific-keywords-are-not-yet-supported
+
         return extractionResult.copy(
             lunchMenus =
                 extractionResult.lunchMenus.let { lunchMenus ->
                     lunchMenus.copy(
+                        // Since structured output's JSON schema does not (yet) support string format, we'll have to validate the start and end times.
+                        // https://platform.openai.com/docs/guides/structured-outputs/some-type-specific-keywords-are-not-yet-supported
                         lunchtimeStart =
                             lunchMenus.lunchtimeStart?.let { lunchtimeStart ->
                                 runCatching { LocalTime.parse(lunchtimeStart) }.fold(
@@ -169,6 +173,46 @@ class ScrapeService(
                                     },
                                 )
                             },
+                        // If the current extraction result is missing menu items, but the previous result has them, the previous result is used instead.
+                        // This might happen if a restaurant omits menus for past days of the week.
+                        dailyMenus =
+                            lunchMenus.dailyMenus.copy(
+                                monday =
+                                    lunchMenus.dailyMenus.monday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.monday
+                                            ?: lunchMenus.dailyMenus.monday
+                                    },
+                                tuesday =
+                                    lunchMenus.dailyMenus.tuesday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.tuesday
+                                            ?: lunchMenus.dailyMenus.tuesday
+                                    },
+                                wednesday =
+                                    lunchMenus.dailyMenus.wednesday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.wednesday
+                                            ?: lunchMenus.dailyMenus.wednesday
+                                    },
+                                thursday =
+                                    lunchMenus.dailyMenus.thursday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.thursday
+                                            ?: lunchMenus.dailyMenus.thursday
+                                    },
+                                friday =
+                                    lunchMenus.dailyMenus.friday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.friday
+                                            ?: lunchMenus.dailyMenus.friday
+                                    },
+                                saturday =
+                                    lunchMenus.dailyMenus.saturday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.saturday
+                                            ?: lunchMenus.dailyMenus.saturday
+                                    },
+                                sunday =
+                                    lunchMenus.dailyMenus.sunday.ifEmpty {
+                                        previousExtractionResult?.lunchMenus?.dailyMenus?.sunday
+                                            ?: lunchMenus.dailyMenus.sunday
+                                    },
+                            ),
                     )
                 },
         )

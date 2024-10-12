@@ -1,8 +1,9 @@
 package com.github.sipe90.lunchscraper.scraping
 
-import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
 import com.github.sipe90.lunchscraper.openai.OpenAIService
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
+import com.github.sipe90.lunchscraper.settings.GlobalSettingsService
+import com.github.sipe90.lunchscraper.util.Utils
 import io.ktor.serialization.kotlinx.json.DefaultJson
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.IOException
@@ -11,14 +12,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExtractionService(
-    config: LunchScraperConfiguration,
-    private val openAIService: OpenAIService,
+    private val globalSettingsService: GlobalSettingsService,
 ) {
     private val json = DefaultJson
-
-    private val systemPrompt = config.scrapingConfig.systemPrompt
-    private val userPromptPrefix = config.scrapingConfig.userPromptPrefix
-
     private val menuExtractionSchema =
         javaClass.getResourceAsStream("/openai/menu_extraction_schema.json")?.use {
             json.decodeFromString<JsonObject>(it.readAllBytes().decodeToString())
@@ -30,10 +26,14 @@ class ExtractionService(
         params: Map<String, String> = emptyMap(),
     ): MenuExtractionResult =
         coroutineScope {
-            val userPrompt = replacePlaceholders(userPromptPrefix, params) + " ${hint ?: ""} $doc"
+            val settings = globalSettingsService.getGlobalSettings()
+            val openAIService = OpenAIService(settings.openAi)
+
+            val userPrompt = Utils.replacePlaceholders(settings.scrape.userPromptPrefix, params) + " ${hint ?: ""} $doc"
+
             val response =
                 openAIService.createCompletion(
-                    listOf(systemPrompt),
+                    listOf(settings.scrape.systemPrompt),
                     listOf(userPrompt),
                     OpenAIService.SchemaOptions(
                         name = "weeks_lunch_menus",
@@ -49,15 +49,4 @@ class ExtractionService(
 
             json.decodeFromString(responseMessage)
         }
-
-    private fun replacePlaceholders(
-        prompt: String,
-        params: Map<String, String>,
-    ): String {
-        val p = params.entries.fold(prompt) { p, (variable, value) -> p.replace("{{$variable}}", value) }
-        if (p.contains(Regex.fromLiteral("{{\\w*}}"))) {
-            throw IllegalArgumentException("Prompt contains undefined variables: $p")
-        }
-        return p
-    }
 }

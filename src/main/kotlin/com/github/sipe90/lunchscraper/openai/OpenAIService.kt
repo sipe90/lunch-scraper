@@ -1,13 +1,12 @@
 package com.github.sipe90.lunchscraper.openai
 
-import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
+import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
 import com.github.sipe90.lunchscraper.openai.model.ChatCompletionRequestSystemMessage
 import com.github.sipe90.lunchscraper.openai.model.ChatCompletionRequestUserMessage
 import com.github.sipe90.lunchscraper.openai.model.ChatCompletionRequestUserMessageTextContentPartPart
 import com.github.sipe90.lunchscraper.openai.model.CreateChatCompletionRequest
 import com.github.sipe90.lunchscraper.openai.model.CreateChatCompletionRequestResponseFormat
 import com.github.sipe90.lunchscraper.openai.model.CreateChatCompletionResponse
-import com.github.sipe90.lunchscraper.openai.model.Model
 import com.github.sipe90.lunchscraper.openai.model.ResponseFormatJsonSchemaJsonSchema
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
@@ -25,13 +24,11 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
 
-@Service
 class OpenAIService(
-    config: LunchScraperConfiguration,
+    private val openAiSettings: OpenAiSettings,
 ) {
     private val json =
         Json {
@@ -44,10 +41,6 @@ class OpenAIService(
             useArrayPolymorphism = false
             ignoreUnknownKeys = true
         }
-
-    private val baseUrl = config.openAiConfig.baseUrl
-    private val apiKey = config.openAiConfig.apiKey
-    private val model = Model.fromString(config.openAiConfig.model)
 
     suspend fun createCompletion(
         systemMessages: List<String>,
@@ -75,7 +68,7 @@ class OpenAIService(
         userMessages: List<String>,
         schemaOptions: SchemaOptions,
     ) = CreateChatCompletionRequest(
-        model = model,
+        model = openAiSettings.model,
         messages =
             systemMessages.map {
                 ChatCompletionRequestSystemMessage(
@@ -119,8 +112,8 @@ class OpenAIService(
             expectSuccess = true
 
             defaultRequest {
-                url(baseUrl)
-                bearerAuth(apiKey)
+                url(openAiSettings.baseUrl)
+                bearerAuth(openAiSettings.apiKey)
             }
         }.use { block(it) }
 

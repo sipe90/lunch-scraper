@@ -1,7 +1,8 @@
 package com.github.sipe90.lunchscraper
 
+import com.github.sipe90.lunchscraper.api.routes.adminRoutes
+import com.github.sipe90.lunchscraper.api.routes.menuRoutes
 import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
-import com.github.sipe90.lunchscraper.plugins.configureRouting
 import com.github.sipe90.lunchscraper.plugins.configureSecurity
 import com.github.sipe90.lunchscraper.plugins.configureSerialization
 import com.github.sipe90.lunchscraper.plugins.configureSpringDI
@@ -32,9 +33,11 @@ fun Application.module() {
     val scrapeSchedulerBean = ctx.getBean(ScrapeScheduler::class.java)
 
     configureSecurity(configBean.apiConfig.apiKey)
-    configureRouting()
     configureSerialization()
     configureSpringDI(ctx)
+
+    menuRoutes()
+    adminRoutes()
 
     monitor.subscribe(ApplicationStarted) {
         if (configBean.schedulerConfig.enabled) {

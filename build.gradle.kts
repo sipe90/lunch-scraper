@@ -71,6 +71,10 @@ dependencies {
     // Kotlinx
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
+    // DB
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.2.0")
+    implementation("org.mongodb:bson-kotlinx:5.2.0")
+
     // DI
     implementation("org.springframework:spring-context:$springContextVersion")
 

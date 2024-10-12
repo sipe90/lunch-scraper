@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.domain
+package com.github.sipe90.lunchscraper.domain.scraping
 
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
 import kotlinx.datetime.Instant

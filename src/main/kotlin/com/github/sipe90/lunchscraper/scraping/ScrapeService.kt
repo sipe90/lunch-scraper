@@ -1,13 +1,13 @@
 package com.github.sipe90.lunchscraper.scraping
 
-import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
+import com.github.sipe90.lunchscraper.area.AreaService
 import com.github.sipe90.lunchscraper.domain.area.Area
+import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
+import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
 import com.github.sipe90.lunchscraper.scraping.html.DocumentCleaner
 import com.github.sipe90.lunchscraper.scraping.html.DocumentLoader
-import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.area.AreaService
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -37,10 +37,11 @@ class ScrapeService(
         val areas = areaService.getAllAreas()
         val previousResults = scrapeResultService.getCurrentWeekResults()
 
-        areas.map { l ->
-            val results = previousResults.filter { it.areaId == l.id }
-            scrapeAllAreaMenus(l, results).awaitAll()
-        }.launchIn(CoroutineScope(Dispatchers.Default))
+        areas
+            .map { l ->
+                val results = previousResults.filter { it.areaId == l.id }
+                scrapeAllAreaMenus(l, results).awaitAll()
+            }.launchIn(CoroutineScope(Dispatchers.Default))
     }
 
     suspend fun scrapeAllAreaMenus(areaId: String) {

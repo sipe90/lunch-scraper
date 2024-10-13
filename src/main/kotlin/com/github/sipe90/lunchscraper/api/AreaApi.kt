@@ -20,7 +20,10 @@ class AreaApi(
 
     suspend fun getArea(areaId: String): AreaOutput? = areaService.getArea(areaId)?.toDto()
 
-    suspend fun updateArea(areaId: String, area: AreaUpdate) {
+    suspend fun updateArea(
+        areaId: String,
+        area: AreaUpdate,
+    ) {
         areaService.updateArea(area.toDomain(areaId))
     }
 
@@ -30,15 +33,25 @@ class AreaApi(
         areaService.deleteArea(areaId)
     }
 
-    suspend fun addRestaurant(areaId: String, restaurant: RestaurantInput) {
+    suspend fun addRestaurant(
+        areaId: String,
+        restaurant: RestaurantInput,
+    ) {
         areaService.addRestaurant(areaId, restaurant.toDomain())
     }
 
-    suspend fun updateRestaurant(areaId: String, restaurantId: String, restaurant: RestaurantUpdate) {
+    suspend fun updateRestaurant(
+        areaId: String,
+        restaurantId: String,
+        restaurant: RestaurantUpdate,
+    ) {
         areaService.updateRestaurant(areaId, restaurant.toDomain(restaurantId))
     }
 
-    suspend fun deleteRestaurant(areaId: String, restaurantId: String) {
+    suspend fun deleteRestaurant(
+        areaId: String,
+        restaurantId: String,
+    ) {
         areaService.deleteRestaurant(areaId, restaurantId)
     }
 }

@@ -1,6 +1,9 @@
 package com.github.sipe90.lunchscraper
 
-import com.github.sipe90.lunchscraper.api.routes.adminRoutes
+import com.github.sipe90.lunchscraper.api.routes.admin.areaRoutes
+import com.github.sipe90.lunchscraper.api.routes.admin.globalSettingsRoutes
+import com.github.sipe90.lunchscraper.api.routes.admin.schedulerRoutes
+import com.github.sipe90.lunchscraper.api.routes.admin.scrapeRoutes
 import com.github.sipe90.lunchscraper.api.routes.menuRoutes
 import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
 import com.github.sipe90.lunchscraper.plugins.configureSecurity
@@ -37,7 +40,11 @@ fun Application.module() {
     configureSpringDI(ctx)
 
     menuRoutes()
-    adminRoutes()
+
+    areaRoutes()
+    globalSettingsRoutes()
+    scrapeRoutes()
+    schedulerRoutes()
 
     monitor.subscribe(ApplicationStarted) {
         if (configBean.schedulerConfig.enabled) {

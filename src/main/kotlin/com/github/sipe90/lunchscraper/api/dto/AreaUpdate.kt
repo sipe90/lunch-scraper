@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AreaUpdate(
     val name: String,
-    ) {
-        fun toDomain(id: String): Area =
-            Area(
-                id = id,
-                name = name,
-                restaurants = emptyList(),
-            )
-    }
+) {
+    fun toDomain(id: String): Area =
+        Area(
+            id = id,
+            name = name,
+            restaurants = emptyList(),
+        )
+}

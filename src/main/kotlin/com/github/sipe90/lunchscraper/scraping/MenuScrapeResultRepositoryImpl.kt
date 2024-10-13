@@ -25,7 +25,7 @@ class MenuScrapeResultRepositoryImpl(
             Filters.and(
                 Filters.eq(MenuScrapeResult::year.name, year),
                 Filters.eq(MenuScrapeResult::week.name, week),
-                Filters.eq(MenuScrapeResult::success.name, true)
+                Filters.eq(MenuScrapeResult::success.name, true),
             )
         return collection().find(filters)
     }

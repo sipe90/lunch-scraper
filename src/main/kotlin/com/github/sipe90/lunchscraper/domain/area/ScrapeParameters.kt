@@ -9,7 +9,9 @@ sealed interface ScrapeParameters {
     val type: ScrapeType
 
     @Serializable
-    enum class ScrapeType(val value: String) {
+    enum class ScrapeType(
+        val value: String,
+    ) {
         @SerialName(value = "html")
         Html("html"),
 

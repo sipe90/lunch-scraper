@@ -4,10 +4,10 @@ import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
 import com.github.sipe90.lunchscraper.domain.area.Area
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
-import com.github.sipe90.lunchscraper.html.DocumentCleaner
-import com.github.sipe90.lunchscraper.html.DocumentLoader
+import com.github.sipe90.lunchscraper.scraping.html.DocumentCleaner
+import com.github.sipe90.lunchscraper.scraping.html.DocumentLoader
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.settings.AreaService
+import com.github.sipe90.lunchscraper.area.AreaService
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging

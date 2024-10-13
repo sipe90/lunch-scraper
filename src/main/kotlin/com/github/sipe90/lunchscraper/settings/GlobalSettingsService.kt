@@ -4,7 +4,6 @@ import com.github.sipe90.lunchscraper.domain.settings.GlobalSettings
 import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
 import com.github.sipe90.lunchscraper.openai.model.Model
-import com.github.sipe90.lunchscraper.repository.SettingsRepository
 import org.springframework.stereotype.Service
 
 @Service

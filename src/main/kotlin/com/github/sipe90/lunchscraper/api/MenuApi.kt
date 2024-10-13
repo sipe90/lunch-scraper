@@ -5,7 +5,7 @@ import com.github.sipe90.lunchscraper.domain.area.Area
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.github.sipe90.lunchscraper.scraping.ScrapeResultService
-import com.github.sipe90.lunchscraper.settings.AreaService
+import com.github.sipe90.lunchscraper.area.AreaService
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.LocalTime
 import org.springframework.stereotype.Service

@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.repository
+package com.github.sipe90.lunchscraper.settings
 
 import com.github.sipe90.lunchscraper.domain.settings.GlobalSettings
 import com.mongodb.client.model.Filters

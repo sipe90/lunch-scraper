@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.repository
+package com.github.sipe90.lunchscraper.scraping
 
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.mongodb.client.model.Filters

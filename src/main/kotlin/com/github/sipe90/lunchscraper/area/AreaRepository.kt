@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.repository
+package com.github.sipe90.lunchscraper.area
 
 import com.github.sipe90.lunchscraper.domain.area.Area
 import com.github.sipe90.lunchscraper.domain.area.Restaurant

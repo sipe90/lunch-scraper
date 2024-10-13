@@ -5,7 +5,7 @@ import com.github.sipe90.lunchscraper.api.dto.AreaOutput
 import com.github.sipe90.lunchscraper.api.dto.AreaUpdate
 import com.github.sipe90.lunchscraper.api.dto.RestaurantInput
 import com.github.sipe90.lunchscraper.api.dto.RestaurantUpdate
-import com.github.sipe90.lunchscraper.settings.AreaService
+import com.github.sipe90.lunchscraper.area.AreaService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service

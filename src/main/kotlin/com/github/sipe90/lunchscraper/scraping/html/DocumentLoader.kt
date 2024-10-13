@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.html
+package com.github.sipe90.lunchscraper.scraping.html
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO

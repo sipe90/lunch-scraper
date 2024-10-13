@@ -1,7 +1,6 @@
 package com.github.sipe90.lunchscraper.scraping
 
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
-import com.github.sipe90.lunchscraper.repository.MenuScrapeResultRepository
 import com.github.sipe90.lunchscraper.util.Utils
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service

@@ -1,8 +1,7 @@
-package com.github.sipe90.lunchscraper.settings
+package com.github.sipe90.lunchscraper.area
 
 import com.github.sipe90.lunchscraper.domain.area.Area
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
-import com.github.sipe90.lunchscraper.repository.AreaRepository
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
 

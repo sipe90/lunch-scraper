@@ -13,11 +13,11 @@ import io.ktor.server.util.getOrFail
 fun Application.menuRoutes() {
     routing {
         route("/menus") {
-            get("/{locationId}") {
+            get("/{areaId}") {
                 val menuApi = springContext.getBean(MenuApi::class.java)
-                val locationId = call.parameters.getOrFail("locationId")
+                val areaId = call.parameters.getOrFail("areaId")
 
-                val menus = menuApi.getLocationMenus(locationId)
+                val menus = menuApi.getAreaMenus(areaId)
                 if (menus == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {

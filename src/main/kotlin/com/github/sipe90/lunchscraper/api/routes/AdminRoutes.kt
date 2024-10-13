@@ -1,8 +1,8 @@
 package com.github.sipe90.lunchscraper.api.routes
 
-import com.github.sipe90.lunchscraper.api.LocationApi
-import com.github.sipe90.lunchscraper.api.dto.LocationInput
-import com.github.sipe90.lunchscraper.api.dto.LocationUpdate
+import com.github.sipe90.lunchscraper.api.AreaApi
+import com.github.sipe90.lunchscraper.api.dto.AreaInput
+import com.github.sipe90.lunchscraper.api.dto.AreaUpdate
 import com.github.sipe90.lunchscraper.api.dto.RestaurantInput
 import com.github.sipe90.lunchscraper.api.dto.RestaurantUpdate
 import com.github.sipe90.lunchscraper.plugins.springContext
@@ -65,22 +65,22 @@ fun Application.adminRoutes() {
                         call.respond(HttpStatusCode.Accepted)
                     }
 
-                    post("/{locationId}") {
+                    post("/{areaId}") {
                         val scrapeService = springContext.getBean(ScrapeService::class.java)
-                        val locationId = call.parameters["locationId"]!!
+                        val areaId = call.parameters["areaId"]!!
 
-                        logger.info { "Scraping all menus for location $locationId" }
-                        launch { scrapeService.scrapeAllLocationMenus(locationId) }
+                        logger.info { "Scraping all menus for area $areaId" }
+                        launch { scrapeService.scrapeAllAreaMenus(areaId) }
                             .invokeOnCompletion {
                                 when (it) {
                                     null -> {
-                                        logger.info { "Finished scraping all menus for: $locationId" }
+                                        logger.info { "Finished scraping all menus for: $areaId" }
                                     }
                                     is CancellationException -> {
-                                        logger.warn(it) { "Scraping cancelled for all menus for: $locationId" }
+                                        logger.warn(it) { "Scraping cancelled for all menus for: $areaId" }
                                     }
                                     else -> {
-                                        logger.error(it) { "Exception thrown while scraping all menus for: $locationId" }
+                                        logger.error(it) { "Exception thrown while scraping all menus for: $areaId" }
                                     }
                                 }
                             }
@@ -88,22 +88,22 @@ fun Application.adminRoutes() {
                         call.respond(HttpStatusCode.Accepted)
                     }
 
-                    post("/{locationId}/{restaurantId}") {
+                    post("/{areaId}/{restaurantId}") {
                         val scrapeService = springContext.getBean(ScrapeService::class.java)
-                        val locationId = call.parameters["locationId"]!!
+                        val areaId = call.parameters["areaId"]!!
                         val restaurantId = call.parameters["restaurantId"]!!
 
-                        launch { scrapeService.scrapeRestaurantMenus(locationId, restaurantId) }
+                        launch { scrapeService.scrapeRestaurantMenus(areaId, restaurantId) }
                             .invokeOnCompletion {
                                 when (it) {
                                     null -> {
-                                        logger.info { "Finished scraping menus for: $locationId/$restaurantId" }
+                                        logger.info { "Finished scraping menus for: $areaId/$restaurantId" }
                                     }
                                     is CancellationException -> {
-                                        logger.warn(it) { "Scraping cancelled for: $locationId/$restaurantId" }
+                                        logger.warn(it) { "Scraping cancelled for: $areaId/$restaurantId" }
                                     }
                                     else -> {
-                                        logger.error(it) { "Exception thrown while scraping menus for: $locationId/$restaurantId" }
+                                        logger.error(it) { "Exception thrown while scraping menus for: $areaId/$restaurantId" }
                                     }
                                 }
                             }
@@ -112,67 +112,67 @@ fun Application.adminRoutes() {
                     }
                 }
 
-                route("/locations") {
+                route("/areas") {
 
                     get {
-                        val locationApi = springContext.getBean(LocationApi::class.java)
+                        val areaApi = springContext.getBean(AreaApi::class.java)
 
-                        val locations = locationApi.getAllLocations()
-                        call.respond(locations)
+                        val areas = areaApi.getAllAreas()
+                        call.respond(areas)
                     }
 
-                    post<LocationInput> {
-                        val locationApi = springContext.getBean(LocationApi::class.java)
+                    post<AreaInput> {
+                        val areaApi = springContext.getBean(AreaApi::class.java)
 
-                        locationApi.createLocation(it)
+                        areaApi.createArea(it)
                         call.respond(HttpStatusCode.OK)
                     }
 
-                    route("/{locationId}") {
+                    route("/{areaId}") {
 
-                        put<LocationUpdate> {
-                            val locationApi = springContext.getBean(LocationApi::class.java)
-                            val locationId = call.parameters["locationId"]!!
+                        put<AreaUpdate> {
+                            val areaApi = springContext.getBean(AreaApi::class.java)
+                            val areaId = call.parameters["areaId"]!!
 
-                            locationApi.updateLocation(locationId, it)
+                            areaApi.updateArea(areaId, it)
                             call.respond(HttpStatusCode.OK)
                         }
 
                         delete {
-                            val locationApi = springContext.getBean(LocationApi::class.java)
-                            val locationId = call.parameters["locationId"]!!
+                            val areaApi = springContext.getBean(AreaApi::class.java)
+                            val areaId = call.parameters["areaId"]!!
 
-                            locationApi.deleteLocation(locationId)
+                            areaApi.deleteArea(areaId)
                             call.respond(HttpStatusCode.OK)
                         }
 
                         route("/restaurants") {
 
                             post<RestaurantInput> {
-                                val locationApi = springContext.getBean(LocationApi::class.java)
-                                val locationId = call.parameters["locationId"]!!
+                                val areaApi = springContext.getBean(AreaApi::class.java)
+                                val areaId = call.parameters["areaId"]!!
 
-                                locationApi.addRestaurant(locationId, it)
+                                areaApi.addRestaurant(areaId, it)
                                 call.respond(HttpStatusCode.OK)
                             }
 
                             route("/{restaurantId}") {
 
                                 put<RestaurantUpdate> {
-                                    val locationApi = springContext.getBean(LocationApi::class.java)
-                                    val locationId = call.parameters["locationId"]!!
+                                    val areaApi = springContext.getBean(AreaApi::class.java)
+                                    val areaId = call.parameters["areaId"]!!
                                     val restaurantId = call.parameters["restaurantId"]!!
 
-                                    locationApi.updateRestaurant(locationId, restaurantId, it)
+                                    areaApi.updateRestaurant(areaId, restaurantId, it)
                                     call.respond(HttpStatusCode.OK)
                                 }
 
                                 delete {
-                                    val locationApi = springContext.getBean(LocationApi::class.java)
-                                    val locationId = call.parameters["locationId"]!!
+                                    val areaApi = springContext.getBean(AreaApi::class.java)
+                                    val areaId = call.parameters["areaId"]!!
                                     val restaurantId = call.parameters["restaurantId"]!!
 
-                                    locationApi.deleteRestaurant(locationId, restaurantId)
+                                    areaApi.deleteRestaurant(areaId, restaurantId)
                                     call.respond(HttpStatusCode.OK)
                                 }
                             }

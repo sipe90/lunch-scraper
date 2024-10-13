@@ -10,16 +10,16 @@ interface MenuScrapeResultRepository {
         week: Int,
     ): Flow<MenuScrapeResult>
 
-    suspend fun findByYearWeekAndLocation(
+    suspend fun findByYearWeekAndArea(
         year: Int,
         week: Int,
-        locationId: String,
+        areaId: String,
     ): Flow<MenuScrapeResult>
 
-    suspend fun findOneByYearWeekLocationAndRestaurant(
+    suspend fun findOneByYearWeekAreaAndRestaurant(
         year: Int,
         week: Int,
-        locationId: String,
+        areaId: String,
         restaurantId: String,
     ): MenuScrapeResult?
 

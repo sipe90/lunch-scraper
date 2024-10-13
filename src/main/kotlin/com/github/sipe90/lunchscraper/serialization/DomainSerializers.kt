@@ -1,8 +1,8 @@
 package com.github.sipe90.lunchscraper.serialization
 
-import com.github.sipe90.lunchscraper.domain.location.HtmlScrapeParameters
-import com.github.sipe90.lunchscraper.domain.location.JsonScrapeParameters
-import com.github.sipe90.lunchscraper.domain.location.ScrapeParameters
+import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
+import com.github.sipe90.lunchscraper.domain.area.JsonScrapeParameters
+import com.github.sipe90.lunchscraper.domain.area.ScrapeParameters
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject

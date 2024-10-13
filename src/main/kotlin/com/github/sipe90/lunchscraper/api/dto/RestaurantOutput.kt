@@ -1,6 +1,6 @@
 package com.github.sipe90.lunchscraper.api.dto
 
-import com.github.sipe90.lunchscraper.domain.location.ScrapeParameters
+import com.github.sipe90.lunchscraper.domain.area.ScrapeParameters
 import kotlinx.serialization.Serializable
 
 @Serializable

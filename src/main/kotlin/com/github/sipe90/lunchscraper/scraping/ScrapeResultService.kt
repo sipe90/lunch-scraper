@@ -13,17 +13,17 @@ class ScrapeResultService(
     suspend fun getCurrentWeekResults(): Flow<MenuScrapeResult> =
         menuScrapeResultRepository.findByYearAndWeek(Utils.getCurrentYear(), Utils.getCurrentWeek())
 
-    suspend fun getCurrentWeekResultsForLocation(locationId: String): Flow<MenuScrapeResult> =
-        menuScrapeResultRepository.findByYearWeekAndLocation(Utils.getCurrentYear(), Utils.getCurrentWeek(), locationId)
+    suspend fun getCurrentWeekResultsForArea(areaId: String): Flow<MenuScrapeResult> =
+        menuScrapeResultRepository.findByYearWeekAndArea(Utils.getCurrentYear(), Utils.getCurrentWeek(), areaId)
 
-    suspend fun getCurrentWeekResultsForLocationAndRestaurant(
-        locationId: String,
+    suspend fun getCurrentWeekResultsForAreaAndRestaurant(
+        areaId: String,
         restaurantId: String,
     ): MenuScrapeResult? =
-        menuScrapeResultRepository.findOneByYearWeekLocationAndRestaurant(
+        menuScrapeResultRepository.findOneByYearWeekAreaAndRestaurant(
             Utils.getCurrentYear(),
             Utils.getCurrentWeek(),
-            locationId,
+            areaId,
             restaurantId,
         )
 

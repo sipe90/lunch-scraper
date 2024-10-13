@@ -30,25 +30,25 @@ class MenuScrapeResultRepositoryImpl(
         return collection().find(filters)
     }
 
-    override suspend fun findByYearWeekAndLocation(
+    override suspend fun findByYearWeekAndArea(
         year: Int,
         week: Int,
-        locationId: String,
+        areaId: String,
     ): Flow<MenuScrapeResult> {
         val filters =
             Filters.and(
                 Filters.eq(MenuScrapeResult::year.name, year),
                 Filters.eq(MenuScrapeResult::week.name, week),
                 Filters.eq(MenuScrapeResult::success.name, true),
-                Filters.eq(MenuScrapeResult::locationId.name, locationId),
+                Filters.eq(MenuScrapeResult::areaId.name, areaId),
             )
         return collection().find(filters)
     }
 
-    override suspend fun findOneByYearWeekLocationAndRestaurant(
+    override suspend fun findOneByYearWeekAreaAndRestaurant(
         year: Int,
         week: Int,
-        locationId: String,
+        areaId: String,
         restaurantId: String,
     ): MenuScrapeResult? {
         val filters =
@@ -56,7 +56,7 @@ class MenuScrapeResultRepositoryImpl(
                 Filters.eq(MenuScrapeResult::year.name, year),
                 Filters.eq(MenuScrapeResult::week.name, week),
                 Filters.eq(MenuScrapeResult::success.name, true),
-                Filters.eq(MenuScrapeResult::locationId.name, locationId),
+                Filters.eq(MenuScrapeResult::areaId.name, areaId),
                 Filters.eq(MenuScrapeResult::restaurantId.name, restaurantId),
             )
         return collection().find(filters).singleOrNull()
@@ -68,7 +68,7 @@ class MenuScrapeResultRepositoryImpl(
                 Filters.eq(MenuScrapeResult::year.name, scrapeResult.year),
                 Filters.eq(MenuScrapeResult::week.name, scrapeResult.week),
                 Filters.eq(MenuScrapeResult::success.name, scrapeResult.success),
-                Filters.eq(MenuScrapeResult::locationId.name, scrapeResult.locationId),
+                Filters.eq(MenuScrapeResult::areaId.name, scrapeResult.areaId),
                 Filters.eq(MenuScrapeResult::restaurantId.name, scrapeResult.restaurantId),
             )
         return collection().replaceOne(filters, scrapeResult, ReplaceOptions().upsert(true)).upsertedId

@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.domain.location
+package com.github.sipe90.lunchscraper.domain.area
 
 import com.github.sipe90.lunchscraper.api.dto.RestaurantOutput
 import kotlinx.serialization.SerialName

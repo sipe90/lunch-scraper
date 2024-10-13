@@ -1,14 +1,14 @@
 package com.github.sipe90.lunchscraper.api.dto
 
-import com.github.sipe90.lunchscraper.domain.location.Location
+import com.github.sipe90.lunchscraper.domain.area.Area
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LocationUpdate(
+data class AreaUpdate(
     val name: String,
     ) {
-        fun toDomain(id: String): Location =
-            Location(
+        fun toDomain(id: String): Area =
+            Area(
                 id = id,
                 name = name,
                 restaurants = emptyList(),

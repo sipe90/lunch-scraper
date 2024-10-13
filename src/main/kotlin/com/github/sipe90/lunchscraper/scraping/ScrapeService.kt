@@ -1,13 +1,13 @@
 package com.github.sipe90.lunchscraper.scraping
 
-import com.github.sipe90.lunchscraper.domain.location.HtmlScrapeParameters
-import com.github.sipe90.lunchscraper.domain.location.Location
-import com.github.sipe90.lunchscraper.domain.location.Restaurant
+import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
+import com.github.sipe90.lunchscraper.domain.area.Area
+import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.github.sipe90.lunchscraper.html.DocumentCleaner
 import com.github.sipe90.lunchscraper.html.DocumentLoader
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.settings.LocationService
+import com.github.sipe90.lunchscraper.settings.AreaService
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
 import org.springframework.stereotype.Service
@@ -30,58 +29,58 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 class ScrapeService(
-    private val locationService: LocationService,
+    private val areaService: AreaService,
     private val scrapeResultService: ScrapeResultService,
     private val extractionService: ExtractionService,
 ) {
     suspend fun scrapeAllMenus() {
-        val locations = locationService.getAllLocations()
+        val areas = areaService.getAllAreas()
         val previousResults = scrapeResultService.getCurrentWeekResults()
 
-        locations.map { l ->
-            val results = previousResults.filter { it.locationId == l.id }
-            scrapeAllLocationMenus(l, results).awaitAll()
+        areas.map { l ->
+            val results = previousResults.filter { it.areaId == l.id }
+            scrapeAllAreaMenus(l, results).awaitAll()
         }.launchIn(CoroutineScope(Dispatchers.Default))
     }
 
-    suspend fun scrapeAllLocationMenus(locationId: String) {
-        val location =
-            locationService.getLocation(locationId)
-                ?: throw IllegalArgumentException("Location not found")
+    suspend fun scrapeAllAreaMenus(areaId: String) {
+        val area =
+            areaService.getArea(areaId)
+                ?: throw IllegalArgumentException("Area not found")
 
-        val previousResults = scrapeResultService.getCurrentWeekResultsForLocation(locationId)
-        scrapeAllLocationMenus(location, previousResults).awaitAll()
+        val previousResults = scrapeResultService.getCurrentWeekResultsForArea(areaId)
+        scrapeAllAreaMenus(area, previousResults).awaitAll()
     }
 
     suspend fun scrapeRestaurantMenus(
-        locationId: String,
+        areaId: String,
         restaurantId: String,
     ) {
-        val location =
-            locationService.getLocation(locationId)
-                ?: throw IllegalArgumentException("Location not found")
+        val area =
+            areaService.getArea(areaId)
+                ?: throw IllegalArgumentException("Area not found")
         val restaurant =
-            location.restaurants.find { it.id == restaurantId }
+            area.restaurants.find { it.id == restaurantId }
                 ?: throw IllegalArgumentException("Restaurant not found")
 
-        val previousResult = scrapeResultService.getCurrentWeekResultsForLocationAndRestaurant(locationId, restaurantId)
-        scrapeRestaurantMenus(location, restaurant, previousResult)
+        val previousResult = scrapeResultService.getCurrentWeekResultsForAreaAndRestaurant(areaId, restaurantId)
+        scrapeRestaurantMenus(area, restaurant, previousResult)
     }
 
-    private suspend fun scrapeAllLocationMenus(
-        location: Location,
+    private suspend fun scrapeAllAreaMenus(
+        area: Area,
         previousResults: Flow<MenuScrapeResult>,
     ) = coroutineScope {
-        location.restaurants.map { rs ->
+        area.restaurants.map { rs ->
             async {
-                val previousResult = previousResults.filter { it.locationId == rs.id }.firstOrNull()
-                scrapeRestaurantMenus(location, rs, previousResult)
+                val previousResult = previousResults.filter { it.areaId == rs.id }.firstOrNull()
+                scrapeRestaurantMenus(area, rs, previousResult)
             }
         }
     }
 
     private suspend fun scrapeRestaurantMenus(
-        location: Location,
+        area: Area,
         restaurant: Restaurant,
         previousResult: MenuScrapeResult?,
     ) = coroutineScope {
@@ -133,7 +132,7 @@ class ScrapeService(
                         year = Utils.getCurrentYear(),
                         week = Utils.getCurrentWeek(),
                         success = true,
-                        locationId = location.id,
+                        areaId = area.id,
                         restaurantId = restaurant.id,
                         document = cleanedDocs,
                         documentHash = documentHash,
@@ -148,7 +147,7 @@ class ScrapeService(
                         year = Utils.getCurrentYear(),
                         week = Utils.getCurrentWeek(),
                         success = false,
-                        locationId = location.id,
+                        areaId = area.id,
                         restaurantId = restaurant.id,
                         document = cleanedDocs,
                         documentHash = documentHash,
@@ -160,7 +159,7 @@ class ScrapeService(
                 throw e
             }
         } catch (e: Exception) {
-            logger.error(e) { "Exception thrown while trying to scrape menus for ${location.id}/${restaurant.id}" }
+            logger.error(e) { "Exception thrown while trying to scrape menus for ${area.id}/${restaurant.id}" }
         }
     }
 

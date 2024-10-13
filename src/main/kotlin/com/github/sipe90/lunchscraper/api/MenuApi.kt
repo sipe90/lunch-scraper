@@ -1,34 +1,34 @@
 package com.github.sipe90.lunchscraper.api
 
 import com.github.sipe90.lunchscraper.api.dto.MenusOutput
-import com.github.sipe90.lunchscraper.domain.location.Location
-import com.github.sipe90.lunchscraper.domain.location.Restaurant
+import com.github.sipe90.lunchscraper.domain.area.Area
+import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.github.sipe90.lunchscraper.scraping.ScrapeResultService
-import com.github.sipe90.lunchscraper.settings.LocationService
+import com.github.sipe90.lunchscraper.settings.AreaService
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.LocalTime
 import org.springframework.stereotype.Service
 
 @Service
 class MenuApi(
-    private val locationService: LocationService,
+    private val areaService: AreaService,
     private val scrapeResultService: ScrapeResultService,
 ) {
-    suspend fun getLocationMenus(locationId: String): MenusOutput? {
-        val location = locationService.getLocation(locationId) ?: return null
-        val results = scrapeResultService.getCurrentWeekResultsForLocation(locationId)
+    suspend fun getAreaMenus(areaId: String): MenusOutput? {
+        val area = areaService.getArea(areaId) ?: return null
+        val results = scrapeResultService.getCurrentWeekResultsForArea(areaId)
 
         return MenusOutput(
-            location = location.toMenusDto(),
+            area = area.toMenusDto(),
             restaurants =
-                location.restaurants.map { rs ->
+                area.restaurants.map { rs ->
                     results.firstOrNull { it.restaurantId == rs.id }.toMenusDto(rs)
                 },
         )
     }
 
-    private fun Location.toMenusDto(): MenusOutput.Location = MenusOutput.Location(name = name)
+    private fun Area.toMenusDto(): MenusOutput.Area = MenusOutput.Area(name = name)
 
     private fun MenuScrapeResult?.toMenusDto(restaurant: Restaurant): MenusOutput.Restaurant =
         if (this != null) {

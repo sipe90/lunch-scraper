@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MenusOutput(
-    val location: Location,
+    val area: Area,
     val restaurants: List<Restaurant>,
 ) {
     @Serializable
-    data class Location(
+    data class Area(
         val name: String,
     )
 

@@ -9,7 +9,7 @@ data class MenuScrapeResult(
     val year: Int,
     val week: Int,
     val success: Boolean,
-    val locationId: String,
+    val areaId: String,
     val restaurantId: String,
     val document: String? = null,
     val documentHash: String,

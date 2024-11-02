@@ -2,7 +2,7 @@ package com.github.sipe90.lunchscraper.scraping
 
 import com.github.sipe90.lunchscraper.openai.OpenAIService
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.settings.GlobalSettingsService
+import com.github.sipe90.lunchscraper.settings.SettingsService
 import com.github.sipe90.lunchscraper.util.Utils
 import io.ktor.serialization.kotlinx.json.DefaultJson
 import kotlinx.coroutines.coroutineScope
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExtractionService(
-    private val globalSettingsService: GlobalSettingsService,
+    private val settingsService: SettingsService,
 ) {
     private val json = DefaultJson
     private val menuExtractionSchema =
@@ -26,7 +26,7 @@ class ExtractionService(
         params: Map<String, String> = emptyMap(),
     ): MenuExtractionResult =
         coroutineScope {
-            val settings = globalSettingsService.getGlobalSettings()
+            val settings = settingsService.getSettings()
             val openAIService = OpenAIService(settings.openAi)
 
             val userPrompt = Utils.replacePlaceholders(settings.scrape.userPromptPrefix, params) + " ${hint ?: ""} $doc"

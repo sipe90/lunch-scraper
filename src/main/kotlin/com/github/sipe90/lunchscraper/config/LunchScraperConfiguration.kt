@@ -10,9 +10,6 @@ open class LunchScraperConfiguration(
 
     val mongoDbConfig: MongoDbConfig
         get() = MongoDbConfig(config.config("mongo-db"))
-
-    val schedulerConfig: SchedulerConfig
-        get() = SchedulerConfig(config.config("scheduler"))
 }
 
 open class MongoDbConfig(
@@ -30,14 +27,4 @@ open class ApiConfig(
 ) {
     val apiKey: String
         get() = config.property("api-key").getString()
-}
-
-class SchedulerConfig(
-    private val config: ApplicationConfig,
-) {
-    val enabled: Boolean
-        get() = config.property("enabled").getString().toBoolean()
-
-    val cron: String
-        get() = config.property("cron").getString()
 }

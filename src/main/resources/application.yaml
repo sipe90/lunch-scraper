@@ -5,33 +5,8 @@ ktor:
   deployment:
     port: 8080
 lunch-scraper:
+  mongo-db:
+    url: ""
+    database: ""
   api:
     api-key: ''
-  open-ai:
-    model: gpt-4o-mini
-    base-url: 'https://api.openai.com/v1/'
-    api-key: ''
-  scheduler:
-    enabled: true
-    cron: 0 0 8-15 ? * * *
-  scraping:
-    system-prompt: >-
-      Process HTML documents of a restaurant's website and extract the weekly
-      lunch menus into a JSON response in the same language that was used in the
-      website. Only extract data of the menus for the specified week. Ignore
-      menus for all other weeks. Follow instructions in schema description
-      properties. If no valid menu for this week is found, output an appropriate
-      error message.
-    user-prompt-prefix: >-
-      Extract information from the following cleaned HTML document and focus on
-      menus for the current week of {{week}}. If the document contains menus for
-      multiple restaurants, only extract menus for the restaurant named {{name}}.
-    save-document: false
-  locations: []
-    #- id: "some-city"
-    #  name: "Some City"
-    #  restaurants:
-    #    - id: "pizza-time"
-    #      name: "Pizza Time"
-    #      urls:
-    #        - "https://pizza.time/lunch"

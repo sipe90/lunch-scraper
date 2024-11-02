@@ -1,13 +1,13 @@
 package com.github.sipe90.lunchscraper.settings
 
-import com.github.sipe90.lunchscraper.domain.settings.GlobalSettings
 import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
+import com.github.sipe90.lunchscraper.domain.settings.Settings
 import com.github.sipe90.lunchscraper.openai.model.Model
 import org.springframework.stereotype.Service
 
 @Service
-class GlobalSettingsService(
+class SettingsService(
     private val settingsRepository: SettingsRepository,
 ) {
     private companion object {
@@ -25,20 +25,20 @@ class GlobalSettingsService(
                 "multiple restaurants, only extract menus for the restaurant named {{name}}."
     }
 
-    suspend fun getGlobalSettings(): GlobalSettings {
+    suspend fun getSettings(): Settings {
         val settings =
-            settingsRepository.getGlobalSettings()
-                ?: return generateDefaultGlobalSettings()
-                    .also { updateGlobalSettings(it) }
+            settingsRepository.getSettings()
+                ?: return generateDefaultSettings()
+                    .also { updateSettings(it) }
         return settings
     }
 
-    suspend fun updateGlobalSettings(settings: GlobalSettings) {
-        settingsRepository.upsertGlobalSettings(settings)
+    suspend fun updateSettings(settings: Settings) {
+        settingsRepository.upsertSettings(settings)
     }
 
-    private fun generateDefaultGlobalSettings(): GlobalSettings =
-        GlobalSettings(
+    private fun generateDefaultSettings(): Settings =
+        Settings(
             openAi =
                 OpenAiSettings(
                     baseUrl = "https://api.openai.com/v1/",
@@ -47,6 +47,8 @@ class GlobalSettingsService(
                 ),
             scrape =
                 ScrapeSettings(
+                    enabled = true,
+                    schedule = "0 0 8-15 ? * * *",
                     systemPrompt = DEFAULT_SYSTEM_PROMPT,
                     userPromptPrefix = DEFAULT_USER_PROMPT_PREFIX,
                 ),

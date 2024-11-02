@@ -1,7 +1,7 @@
 package com.github.sipe90.lunchscraper.api.routes.admin
 
 import com.github.sipe90.lunchscraper.api.SettingsApi
-import com.github.sipe90.lunchscraper.api.dto.GlobalSettingsInput
+import com.github.sipe90.lunchscraper.api.dto.SettingsInput
 import com.github.sipe90.lunchscraper.plugins.springContext
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -12,7 +12,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 
-fun Application.globalSettingsRoutes() {
+fun Application.settingsRoutes() {
     routing {
         route("/admin") {
             authenticate {
@@ -20,14 +20,14 @@ fun Application.globalSettingsRoutes() {
                     get {
                         val settingsApi = springContext.getBean(SettingsApi::class.java)
 
-                        val settings = settingsApi.getGlobalSettings()
+                        val settings = settingsApi.getSettings()
                         call.respond(settings)
                     }
 
-                    post<GlobalSettingsInput> {
+                    post<SettingsInput> {
                         val settingsApi = springContext.getBean(SettingsApi::class.java)
 
-                        settingsApi.updateGlobalSettings(it)
+                        settingsApi.updateSettings(it)
                         call.respond(HttpStatusCode.OK)
                     }
                 }

@@ -1,13 +1,13 @@
 package com.github.sipe90.lunchscraper.api.dto
 
-import com.github.sipe90.lunchscraper.domain.settings.GlobalSettings
 import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
+import com.github.sipe90.lunchscraper.domain.settings.Settings
 import com.github.sipe90.lunchscraper.openai.model.Model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GlobalSettingsInput(
+data class SettingsInput(
     val openAi: OpenAiSettingsInput,
     val scrape: ScrapeSettingsInput,
 ) {
@@ -20,12 +20,14 @@ data class GlobalSettingsInput(
 
     @Serializable
     data class ScrapeSettingsInput(
+        val enabled: Boolean,
+        val schedule: String,
         val systemPrompt: String,
         val userPromptPrefix: String,
     )
 
-    fun toDomain(): GlobalSettings =
-        GlobalSettings(
+    fun toDomain(): Settings =
+        Settings(
             openAi =
                 OpenAiSettings(
                     baseUrl = openAi.baseUrl,
@@ -34,6 +36,8 @@ data class GlobalSettingsInput(
                 ),
             scrape =
                 ScrapeSettings(
+                    enabled = scrape.enabled,
+                    schedule = scrape.schedule,
                     systemPrompt = scrape.systemPrompt,
                     userPromptPrefix = scrape.userPromptPrefix,
                 ),

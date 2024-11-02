@@ -1,9 +1,9 @@
 package com.github.sipe90.lunchscraper.settings
 
-import com.github.sipe90.lunchscraper.domain.settings.GlobalSettings
+import com.github.sipe90.lunchscraper.domain.settings.Settings
 
 interface SettingsRepository {
-    suspend fun getGlobalSettings(): GlobalSettings?
+    suspend fun getSettings(): Settings?
 
-    suspend fun upsertGlobalSettings(settings: GlobalSettings)
+    suspend fun upsertSettings(settings: Settings)
 }

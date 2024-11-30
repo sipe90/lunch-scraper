@@ -111,25 +111,6 @@ tasks.register("createGeneratedSourceFolders") {
     mkdir("${layout.buildDirectory.get()}/generated/src/main/kotlin/com/github/sipe90/lunchscraper/openapi")
 }
 
-tasks.register<NpxTask>("generateRestaurantExtractionModel") {
-    dependsOn("createGeneratedSourceFolders")
-
-    val inputFile = "src/main/resources/openai/restaurant_extraction_schema.json"
-    val outputFile = "${layout.buildDirectory.get()}/generated/src/main/kotlin/com/github/sipe90/lunchscraper/openapi/RestaurantExtractionResult.kt"
-
-    inputs.file(inputFile)
-    outputs.file(outputFile)
-
-    command = "quicktype"
-    args = listOf(
-        "--src-lang", "schema",
-        "--out", outputFile,
-        "--framework", "kotlinx",
-        "--package", "com.github.sipe90.lunchscraper.openapi",
-        inputFile
-    )
-}
-
 tasks.register<NpxTask>("generateMenuExtractionModel") {
     dependsOn("createGeneratedSourceFolders")
 
@@ -153,5 +134,5 @@ sourceSets.main.configure {
     kotlin.srcDirs("${layout.buildDirectory.get()}/generated/src/main/kotlin")
 }
 
-tasks.getByName("compileKotlin").dependsOn("generateRestaurantExtractionModel", "generateMenuExtractionModel")
+tasks.getByName("compileKotlin").dependsOn("generateMenuExtractionModel")
 tasks.getByName("afterReleaseBuild").dependsOn("publishImage")

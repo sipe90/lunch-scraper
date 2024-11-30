@@ -8,7 +8,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
-import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 
@@ -24,7 +24,7 @@ fun Application.settingsRoutes() {
                         call.respond(settings)
                     }
 
-                    post<SettingsInput> {
+                    put<SettingsInput> {
                         val settingsApi = springContext.getBean(SettingsApi::class.java)
 
                         settingsApi.updateSettings(it)

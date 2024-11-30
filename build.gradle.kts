@@ -15,6 +15,7 @@ plugins {
     id("com.github.node-gradle.node") version "7.0.2"
     id("net.researchgate.release") version "3.0.2"
     id("org.jmailen.kotlinter") version "4.4.1"
+    // id("org.openapi.generator") version "7.10.0"
 }
 
 group = "com.github.sipe90"
@@ -106,6 +107,23 @@ node {
     download = true
     version = "20.17.0"
 }
+
+/*
+openApiGenerate {
+    remoteInputSpec.set("https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/master/openapi.yaml")
+    packageName.set("com.github.sipe90.lunchscraper.openapi")
+    generatorName.set("kotlin")
+    skipValidateSpec.set(true)
+    configOptions.set(mapOf(
+        "dateLibrary" to "kotlinx-datetime",
+        "generateOneOfAnyOfWrappers" to "true",
+        "library" to "jvm-ktor",
+        "serializationLibrary" to "kotlinx_serialization"
+    ))
+
+    outputDir.set("${layout.buildDirectory.get()}/generated")
+}
+*/
 
 tasks.register("createGeneratedSourceFolders") {
     mkdir("${layout.buildDirectory.get()}/generated/src/main/kotlin/com/github/sipe90/lunchscraper/openapi")

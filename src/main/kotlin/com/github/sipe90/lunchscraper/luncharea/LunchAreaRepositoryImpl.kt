@@ -1,6 +1,6 @@
-package com.github.sipe90.lunchscraper.area
+package com.github.sipe90.lunchscraper.luncharea
 
-import com.github.sipe90.lunchscraper.domain.area.Area
+import com.github.sipe90.lunchscraper.domain.area.LunchArea
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
@@ -12,32 +12,32 @@ import org.bson.BsonValue
 import org.springframework.stereotype.Repository
 
 @Repository
-class AreaRepositoryImpl(
+class LunchAreaRepositoryImpl(
     private val database: MongoDatabase,
-) : AreaRepository {
+) : LunchAreaRepository {
     private companion object {
         const val COLLECTION = "areas"
     }
 
-    override suspend fun insertOneArea(area: Area): BsonValue? = collection().insertOne(area).insertedId
+    override suspend fun insertOneLunchArea(lunchArea: LunchArea): BsonValue? = collection().insertOne(lunchArea).insertedId
 
-    override suspend fun deleteAreaById(areaId: String): Long = collection().deleteOne(Filters.eq("_id", areaId)).deletedCount
+    override suspend fun deleteLunchAreaById(areaId: String): Long = collection().deleteOne(Filters.eq("_id", areaId)).deletedCount
 
-    override suspend fun findAreaById(areaId: String): Area? = collection().find(Filters.eq("_id", areaId)).firstOrNull()
+    override suspend fun findLunchAreaById(areaId: String): LunchArea? = collection().find(Filters.eq("_id", areaId)).firstOrNull()
 
-    override suspend fun findAllAreas(): Flow<Area> = collection().find()
+    override suspend fun findAllLunchAreas(): Flow<LunchArea> = collection().find()
 
-    override suspend fun updateOneArea(
+    override suspend fun updateOneLunchArea(
         areaId: String,
         name: String,
     ): Long {
         val filter = Filters.eq("_id", areaId)
-        val updates = Updates.set(Area::name.name, name)
+        val updates = Updates.set(LunchArea::name.name, name)
 
         return collection().updateOne(filter, updates).matchedCount
     }
 
-    override suspend fun addRestaurantToArea(
+    override suspend fun addRestaurantToLunchArea(
         areaId: String,
         restaurant: Restaurant,
     ): Boolean {
@@ -46,22 +46,22 @@ class AreaRepositoryImpl(
                 Filters.eq("_id", areaId),
                 Filters.not(Filters.elemMatch("restaurants", Filters.eq("_id", restaurant.id))),
             )
-        val update = Updates.addToSet(Area::restaurants.name, restaurant)
+        val update = Updates.addToSet(LunchArea::restaurants.name, restaurant)
 
         return collection().updateOne(filter, update).modifiedCount > 0
     }
 
-    override suspend fun deleteRestaurantFromArea(
+    override suspend fun deleteRestaurantFromLunchArea(
         areaId: String,
         restaurantId: String,
     ): Boolean {
         val filter = Filters.eq("_id", areaId)
-        val update = Updates.pull(Area::restaurants.name, Filters.eq("_id", restaurantId))
+        val update = Updates.pull(LunchArea::restaurants.name, Filters.eq("_id", restaurantId))
 
         return collection().updateOne(filter, update).modifiedCount > 0
     }
 
-    override suspend fun updateAreaRestaurant(
+    override suspend fun updateLunchAreaRestaurant(
         areaId: String,
         restaurant: Restaurant,
     ): Boolean {
@@ -72,5 +72,5 @@ class AreaRepositoryImpl(
         return collection().updateOne(filter, update, options).modifiedCount > 0
     }
 
-    private fun collection() = database.getCollection<Area>(COLLECTION)
+    private fun collection() = database.getCollection<LunchArea>(COLLECTION)
 }

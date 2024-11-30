@@ -1,6 +1,6 @@
 package com.github.sipe90.lunchscraper
 
-import com.github.sipe90.lunchscraper.api.routes.admin.areaRoutes
+import com.github.sipe90.lunchscraper.api.routes.admin.lunchAreaRoutes
 import com.github.sipe90.lunchscraper.api.routes.admin.scrapeRoutes
 import com.github.sipe90.lunchscraper.api.routes.admin.settingsRoutes
 import com.github.sipe90.lunchscraper.api.routes.menuRoutes
@@ -43,7 +43,7 @@ fun Application.module() {
 
     menuRoutes()
 
-    areaRoutes()
+    lunchAreaRoutes()
     settingsRoutes()
     scrapeRoutes()
 

@@ -1,8 +1,8 @@
 package com.github.sipe90.lunchscraper.api.routes.admin
 
-import com.github.sipe90.lunchscraper.api.AreaApi
-import com.github.sipe90.lunchscraper.api.dto.AreaInput
-import com.github.sipe90.lunchscraper.api.dto.AreaUpdate
+import com.github.sipe90.lunchscraper.api.LunchAreaApi
+import com.github.sipe90.lunchscraper.api.dto.LunchAreaInput
+import com.github.sipe90.lunchscraper.api.dto.LunchAreaUpdate
 import com.github.sipe90.lunchscraper.api.dto.RestaurantInput
 import com.github.sipe90.lunchscraper.api.dto.RestaurantUpdate
 import com.github.sipe90.lunchscraper.plugins.springContext
@@ -21,67 +21,67 @@ import io.ktor.server.util.getOrFail
 
 private val logger = KotlinLogging.logger {}
 
-fun Application.areaRoutes() {
+fun Application.lunchAreaRoutes() {
     routing {
         route("/admin") {
             authenticate {
                 route("/areas") {
                     get {
-                        val areaApi = springContext.getBean(AreaApi::class.java)
+                        val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
 
-                        val areas = areaApi.getAllAreas()
+                        val areas = lunchAreaApi.getAllLunchAreas()
                         call.respond(areas)
                     }
 
-                    post<AreaInput> {
-                        val areaApi = springContext.getBean(AreaApi::class.java)
+                    post<LunchAreaInput> {
+                        val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
 
-                        areaApi.createArea(it)
+                        lunchAreaApi.createLunchArea(it)
                         call.respond(HttpStatusCode.OK)
                     }
 
                     route("/{areaId}") {
-                        put<AreaUpdate> {
-                            val areaApi = springContext.getBean(AreaApi::class.java)
+                        put<LunchAreaUpdate> {
+                            val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
                             val areaId = call.parameters.getOrFail("areaId")
 
-                            areaApi.updateArea(areaId, it)
+                            lunchAreaApi.updateLunchArea(areaId, it)
                             call.respond(HttpStatusCode.OK)
                         }
 
                         delete {
-                            val areaApi = springContext.getBean(AreaApi::class.java)
+                            val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
                             val areaId = call.parameters.getOrFail("areaId")
 
-                            areaApi.deleteArea(areaId)
+                            lunchAreaApi.deleteLunchArea(areaId)
                             call.respond(HttpStatusCode.OK)
                         }
 
                         route("/restaurants") {
                             post<RestaurantInput> {
-                                val areaApi = springContext.getBean(AreaApi::class.java)
+                                val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
                                 val areaId = call.parameters.getOrFail("areaId")
 
-                                areaApi.addRestaurant(areaId, it)
+                                lunchAreaApi.addRestaurant(areaId, it)
                                 call.respond(HttpStatusCode.OK)
                             }
 
                             route("/{restaurantId}") {
                                 put<RestaurantUpdate> {
-                                    val areaApi = springContext.getBean(AreaApi::class.java)
+                                    val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
                                     val areaId = call.parameters.getOrFail("areaId")
                                     val restaurantId = call.parameters.getOrFail("restaurantId")
 
-                                    areaApi.updateRestaurant(areaId, restaurantId, it)
+                                    lunchAreaApi.updateRestaurant(areaId, restaurantId, it)
                                     call.respond(HttpStatusCode.OK)
                                 }
 
                                 delete {
-                                    val areaApi = springContext.getBean(AreaApi::class.java)
+                                    val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
                                     val areaId = call.parameters.getOrFail("areaId")
                                     val restaurantId = call.parameters.getOrFail("restaurantId")
 
-                                    areaApi.deleteRestaurant(areaId, restaurantId)
+                                    lunchAreaApi.deleteRestaurant(areaId, restaurantId)
                                     call.respond(HttpStatusCode.OK)
                                 }
                             }

@@ -6,5 +6,4 @@ import kotlinx.serialization.Serializable
 data class LunchAreaOutput(
     val id: String,
     val name: String,
-    val restaurants: List<RestaurantOutput>,
 )

@@ -16,7 +16,7 @@ class LunchAreaRepositoryImpl(
     private val database: MongoDatabase,
 ) : LunchAreaRepository {
     private companion object {
-        const val COLLECTION = "areas"
+        const val COLLECTION = "lunch-areas"
     }
 
     override suspend fun insertOneLunchArea(lunchArea: LunchArea): BsonValue? = collection().insertOne(lunchArea).insertedId

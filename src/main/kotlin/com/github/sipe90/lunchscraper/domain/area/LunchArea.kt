@@ -15,6 +15,5 @@ data class LunchArea(
         LunchAreaOutput(
             id = id,
             name = name,
-            restaurants = restaurants.map { it.toDto() },
         )
 }

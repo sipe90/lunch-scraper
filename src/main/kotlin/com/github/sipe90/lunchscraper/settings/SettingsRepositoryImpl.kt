@@ -26,7 +26,6 @@ class SettingsRepositoryImpl(
         val filter = Filters.eq("_id", ID)
         val updates =
             Updates.combine(
-                Updates.set(Settings::openAi.name, settings.openAi),
                 Updates.set(Settings::scrape.name, settings.scrape),
             )
         val options = UpdateOptions().upsert(true)

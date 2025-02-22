@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 open class MongoDbConfiguration(
-    val config: LunchScraperConfiguration,
+    val config: MongoDbConfig,
 ) {
     @Bean
-    open fun mongoClient(): MongoClient = MongoClient.create(config.mongoDbConfig.url)
+    open fun mongoClient(): MongoClient = MongoClient.create(config.url)
 
     @Bean
-    open fun mongoDatabase(client: MongoClient): MongoDatabase = client.getDatabase(config.mongoDbConfig.database)
+    open fun mongoDatabase(client: MongoClient): MongoDatabase = client.getDatabase(config.database)
 }

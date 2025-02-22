@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 @Service
 class ExtractionService(
     private val settingsService: SettingsService,
+    private val openAIService: OpenAIService,
 ) {
     private val json = DefaultJson
     private val menuExtractionSchema =
@@ -27,7 +28,6 @@ class ExtractionService(
     ): MenuExtractionResult =
         coroutineScope {
             val settings = settingsService.getSettings()
-            val openAIService = OpenAIService(settings.openAi)
 
             val userPrompt = Utils.replacePlaceholders(settings.scrape.userPromptPrefix, params) + " ${hint ?: ""} $doc"
 

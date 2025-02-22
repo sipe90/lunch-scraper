@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Settings(
-    val openAi: OpenAiSettings,
     val scrape: ScrapeSettings,
 )

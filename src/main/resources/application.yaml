@@ -6,7 +6,11 @@ ktor:
     port: 8080
 lunch-scraper:
   mongo-db:
-    url: ""
-    database: ""
+    url: ''
+    database: ''
   api:
     api-key: ''
+  open-ai:
+    api-key: ''
+    base-url: 'https://api.openai.com/v1/'
+    model: gpt-4o

@@ -13,17 +13,19 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
-import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
+import com.github.sipe90.lunchscraper.config.OpenAiConfig
 import kotlinx.serialization.json.JsonObject
+import org.springframework.stereotype.Service
 import kotlin.time.Duration.Companion.seconds
 
+@Service
 class OpenAIService(
-    private val openAiSettings: OpenAiSettings,
+    private val config: OpenAiConfig,
 ) {
     private val openAi =
         OpenAI(
-            token = openAiSettings.apiKey,
-            host = OpenAIHost(baseUrl = openAiSettings.baseUrl),
+            token = config.apiKey,
+            host = OpenAIHost(baseUrl = config.baseUrl),
             timeout = Timeout(socket = 60.seconds),
             logging =
                 LoggingConfig(
@@ -55,7 +57,7 @@ class OpenAIService(
 
         val chatCompletionRequest =
             ChatCompletionRequest(
-                model = ModelId(openAiSettings.model),
+                model = ModelId(config.model),
                 messages = systemChatMessages + userChatMessages,
                 responseFormat =
                     ChatResponseFormat.jsonSchema(

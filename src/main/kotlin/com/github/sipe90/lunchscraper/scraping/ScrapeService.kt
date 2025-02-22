@@ -1,13 +1,11 @@
 package com.github.sipe90.lunchscraper.scraping
 
-import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
 import com.github.sipe90.lunchscraper.domain.area.LunchArea
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.github.sipe90.lunchscraper.luncharea.LunchAreaService
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.scraping.html.DocumentCleaner
-import com.github.sipe90.lunchscraper.scraping.html.DocumentLoader
+import com.github.sipe90.lunchscraper.scraping.scraper.ScraperFactory
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -31,7 +29,7 @@ private val logger = KotlinLogging.logger {}
 class ScrapeService(
     private val lunchAreaService: LunchAreaService,
     private val scrapeResultService: ScrapeResultService,
-    private val extractionService: ExtractionService,
+    private val scraperFactory: ScraperFactory,
 ) {
     suspend fun scrapeAllMenus() {
         val areas = lunchAreaService.getAllLunchAreas()
@@ -86,25 +84,11 @@ class ScrapeService(
         previousResult: MenuScrapeResult?,
     ) = coroutineScope {
         try {
-            if (restaurant.parameters !is HtmlScrapeParameters) {
-                logger.info { "Skipping scrape for restaurant ${restaurant.id}" }
-                return@coroutineScope
-            }
-
             logger.info { "Scraping menus for restaurant ${restaurant.id}" }
 
-            val htmlDocs =
-                restaurant.parameters.documents
-                    .map {
-                        async {
-                            DocumentLoader.loadHtmlDocument(it.url).let {
-                                DocumentCleaner.cleanDocument(it)
-                            }
-                        }
-                    }.awaitAll()
-
-            val cleanedDocs = htmlDocs.joinToString("\n")
-            val documentHash = cleanedDocs.md5()
+            val scraper = scraperFactory.create(restaurant.parameters)
+            val document = scraper.loadDocument()
+            val documentHash = document.md5()
 
             if (previousResult != null) {
                 if (previousResult.documentHash == documentHash) {
@@ -118,10 +102,10 @@ class ScrapeService(
 
             val params =
                 mapOf(
-                    "week" to Utils.getCurrentWeek().toString(),
                     "name" to restaurant.name,
                 )
-            var extractionResult = extractionService.extractMenusFromDocument(cleanedDocs, restaurant.hint, params)
+
+            var extractionResult = scraper.extractData(document, params)
 
             try {
                 extractionResult = validateExtractionResult(extractionResult, previousResult?.extractionResult)
@@ -135,7 +119,7 @@ class ScrapeService(
                         success = true,
                         areaId = lunchArea.id,
                         restaurantId = restaurant.id,
-                        document = cleanedDocs,
+                        document = document,
                         documentHash = documentHash,
                         scrapeTimestamp = Clock.System.now(),
                         extractionResult = extractionResult,
@@ -150,7 +134,7 @@ class ScrapeService(
                         success = false,
                         areaId = lunchArea.id,
                         restaurantId = restaurant.id,
-                        document = cleanedDocs,
+                        document = document,
                         documentHash = documentHash,
                         scrapeTimestamp = Clock.System.now(),
                         extractionResult = extractionResult,
@@ -208,37 +192,37 @@ class ScrapeService(
                                 monday =
                                     lunchMenus.dailyMenus.monday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.monday
-                                            ?: lunchMenus.dailyMenus.monday
+                                            ?: emptyList()
                                     },
                                 tuesday =
                                     lunchMenus.dailyMenus.tuesday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.tuesday
-                                            ?: lunchMenus.dailyMenus.tuesday
+                                            ?: emptyList()
                                     },
                                 wednesday =
                                     lunchMenus.dailyMenus.wednesday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.wednesday
-                                            ?: lunchMenus.dailyMenus.wednesday
+                                            ?: emptyList()
                                     },
                                 thursday =
                                     lunchMenus.dailyMenus.thursday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.thursday
-                                            ?: lunchMenus.dailyMenus.thursday
+                                            ?: emptyList()
                                     },
                                 friday =
                                     lunchMenus.dailyMenus.friday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.friday
-                                            ?: lunchMenus.dailyMenus.friday
+                                            ?: emptyList()
                                     },
                                 saturday =
                                     lunchMenus.dailyMenus.saturday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.saturday
-                                            ?: lunchMenus.dailyMenus.saturday
+                                            ?: emptyList()
                                     },
                                 sunday =
                                     lunchMenus.dailyMenus.sunday.ifEmpty {
                                         previousExtractionResult?.lunchMenus?.dailyMenus?.sunday
-                                            ?: lunchMenus.dailyMenus.sunday
+                                            ?: emptyList()
                                     },
                             ),
                     )

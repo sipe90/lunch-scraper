@@ -10,7 +10,6 @@ data class Restaurant(
     val id: String,
     val name: String,
     val url: String? = null,
-    val hint: String? = null,
     val parameters: ScrapeParameters,
 ) {
     fun toDto(): RestaurantOutput =
@@ -18,7 +17,6 @@ data class Restaurant(
             id = id,
             name = name,
             url = url,
-            hint = hint,
             parameters = parameters,
         )
 }

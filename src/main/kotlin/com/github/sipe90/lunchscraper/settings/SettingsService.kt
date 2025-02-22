@@ -10,16 +10,17 @@ class SettingsService(
 ) {
     private companion object {
         const val DEFAULT_SYSTEM_PROMPT =
-            "Process HTML documents of a restaurant's website and extract the weekly " +
-                "lunch menus into a JSON response in the same language that was used in the " +
-                "website. Only extract data of the menus for the specified week. Ignore " +
-                "menus for all other weeks. Follow instructions in schema description " +
-                "properties. If no valid menu for this week is found, output an appropriate " +
-                "error message."
+            "You act as a data extractor. You process text documents scraped off from a restaurant's website " +
+                "and the expected end result is a JSON document containing the current week's lunch menu." +
+                "Use the same language as the one used in the documents. " +
+                "Only extract data of the menus for the specified week and ignore menus for all other weeks. " +
+                "Follow instructions in schema description properties. " +
+                "If no valid menu for this week is found, output an appropriate error message. " +
+                "You are allowed and encouraged to correct small spelling mistakes in menu item descriptions."
 
         const val DEFAULT_USER_PROMPT_PREFIX =
-            "Extract information from the following cleaned HTML document and focus on " +
-                "menus for the current week of {{week}}. If the document contains menus for " +
+            "Extract information from the following text document(s) and focus on " +
+                "menus for the current week ({{week}}). If the document contains menus for " +
                 "multiple restaurants, only extract menus for the restaurant named {{name}}."
     }
 

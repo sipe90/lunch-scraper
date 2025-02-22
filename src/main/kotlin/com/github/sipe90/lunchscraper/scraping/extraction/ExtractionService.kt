@@ -1,9 +1,7 @@
-package com.github.sipe90.lunchscraper.scraping
+package com.github.sipe90.lunchscraper.scraping.extraction
 
 import com.github.sipe90.lunchscraper.openai.OpenAIService
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.settings.SettingsService
-import com.github.sipe90.lunchscraper.util.Utils
 import io.ktor.serialization.kotlinx.json.DefaultJson
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.IOException
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExtractionService(
-    private val settingsService: SettingsService,
     private val openAIService: OpenAIService,
 ) {
     private val json = DefaultJson
@@ -22,19 +19,14 @@ class ExtractionService(
         } ?: throw IOException("Unable to read menu extraction JSON schema.")
 
     suspend fun extractMenusFromDocument(
-        doc: String,
-        hint: String?,
-        params: Map<String, String> = emptyMap(),
+        systemMessage: String,
+        userMessage: String,
     ): MenuExtractionResult =
         coroutineScope {
-            val settings = settingsService.getSettings()
-
-            val userPrompt = Utils.replacePlaceholders(settings.scrape.userPromptPrefix, params) + " ${hint ?: ""} $doc"
-
             val response =
                 openAIService.createChatCompletion(
-                    listOf(settings.scrape.systemPrompt),
-                    listOf(userPrompt),
+                    listOf(systemMessage),
+                    listOf(userMessage),
                     OpenAIService.SchemaOptions(
                         name = "weeks_lunch_menus",
                         schema = menuExtractionSchema,

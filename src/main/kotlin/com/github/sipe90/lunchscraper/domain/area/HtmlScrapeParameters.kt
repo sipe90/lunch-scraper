@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HtmlScrapeParameters(
+    override val type: ScrapeParameters.ScrapeType = ScrapeParameters.ScrapeType.Html,
+    override val hint: String? = null,
     val documents: List<DocumentParameter>,
-) : ScrapeParameters {
-    override val type: ScrapeParameters.ScrapeType = ScrapeParameters.ScrapeType.Html
-}
+) : ScrapeParameters

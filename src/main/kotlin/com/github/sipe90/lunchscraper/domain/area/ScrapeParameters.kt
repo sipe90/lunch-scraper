@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable(with = ScrapeParametersSerializer::class)
 sealed interface ScrapeParameters {
     val type: ScrapeType
+    val hint: String?
 
     @Serializable
     enum class ScrapeType(

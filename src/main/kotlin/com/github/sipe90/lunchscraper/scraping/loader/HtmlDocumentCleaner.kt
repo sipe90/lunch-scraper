@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.scraping.html
+package com.github.sipe90.lunchscraper.scraping.loader
 
 import org.jsoup.internal.StringUtil
 import org.jsoup.nodes.Comment
@@ -9,7 +9,7 @@ import org.jsoup.nodes.TextNode
 import org.jsoup.select.NodeTraversor
 import org.jsoup.select.NodeVisitor
 
-object DocumentCleaner {
+object HtmlDocumentCleaner {
     fun cleanDocument(doc: Document): String {
         doc.outputSettings().prettyPrint(false)
 

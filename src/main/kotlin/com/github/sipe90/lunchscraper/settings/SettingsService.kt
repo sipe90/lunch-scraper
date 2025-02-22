@@ -3,7 +3,6 @@ package com.github.sipe90.lunchscraper.settings
 import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
 import com.github.sipe90.lunchscraper.domain.settings.Settings
-import com.github.sipe90.lunchscraper.openai.model.Model
 import org.springframework.stereotype.Service
 
 @Service
@@ -42,7 +41,7 @@ class SettingsService(
             openAi =
                 OpenAiSettings(
                     baseUrl = "https://api.openai.com/v1/",
-                    model = Model.fromString("gpt-4o"),
+                    model = "gpt-4o",
                     apiKey = "UNSET",
                 ),
             scrape =

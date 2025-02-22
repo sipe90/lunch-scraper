@@ -32,12 +32,11 @@ class ExtractionService(
             val userPrompt = Utils.replacePlaceholders(settings.scrape.userPromptPrefix, params) + " ${hint ?: ""} $doc"
 
             val response =
-                openAIService.createCompletion(
+                openAIService.createChatCompletion(
                     listOf(settings.scrape.systemPrompt),
                     listOf(userPrompt),
                     OpenAIService.SchemaOptions(
                         name = "weeks_lunch_menus",
-                        description = "A restaurant's weekly lunch menus",
                         schema = menuExtractionSchema,
                     ),
                 )

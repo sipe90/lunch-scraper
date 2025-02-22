@@ -3,7 +3,6 @@ package com.github.sipe90.lunchscraper.api.dto
 import com.github.sipe90.lunchscraper.domain.settings.OpenAiSettings
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
 import com.github.sipe90.lunchscraper.domain.settings.Settings
-import com.github.sipe90.lunchscraper.openai.model.Model
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,7 +30,7 @@ data class SettingsInput(
             openAi =
                 OpenAiSettings(
                     baseUrl = openAi.baseUrl,
-                    model = Model.fromString(openAi.model),
+                    model = openAi.model,
                     apiKey = openAi.apiKey,
                 ),
             scrape =

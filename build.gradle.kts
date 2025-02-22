@@ -11,7 +11,7 @@ plugins {
     idea
     kotlin("jvm") version "2.0.20"
     kotlin("plugin.serialization") version "2.0.20"
-    id("io.ktor.plugin") version "3.0.0-rc-1"
+    id("io.ktor.plugin") version "3.0.0"
     id("com.github.node-gradle.node") version "7.0.2"
     id("net.researchgate.release") version "3.0.2"
     id("org.jmailen.kotlinter") version "4.4.1"
@@ -71,12 +71,19 @@ dependencies {
     // Kotlinx
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
+    // DB
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.2.0")
+    implementation("org.mongodb:bson-kotlinx:5.2.0")
+
     // DI
     implementation("org.springframework:spring-context:$springContextVersion")
 
     // Task scheduling
     implementation("com.github.Pool-Of-Tears:KtScheduler:1.1.6")
     implementation("com.cronutils:cron-utils:9.2.1")
+
+    // OpenAI
+    implementation("com.aallam.openai:openai-client:4.0.1")
 
     // HTML Parsing
     implementation("org.jsoup:jsoup:1.18.1")
@@ -107,25 +114,6 @@ tasks.register("createGeneratedSourceFolders") {
     mkdir("${layout.buildDirectory.get()}/generated/src/main/kotlin/com/github/sipe90/lunchscraper/openapi")
 }
 
-tasks.register<NpxTask>("generateRestaurantExtractionModel") {
-    dependsOn("createGeneratedSourceFolders")
-
-    val inputFile = "src/main/resources/openai/restaurant_extraction_schema.json"
-    val outputFile = "${layout.buildDirectory.get()}/generated/src/main/kotlin/com/github/sipe90/lunchscraper/openapi/RestaurantExtractionResult.kt"
-
-    inputs.file(inputFile)
-    outputs.file(outputFile)
-
-    command = "quicktype"
-    args = listOf(
-        "--src-lang", "schema",
-        "--out", outputFile,
-        "--framework", "kotlinx",
-        "--package", "com.github.sipe90.lunchscraper.openapi",
-        inputFile
-    )
-}
-
 tasks.register<NpxTask>("generateMenuExtractionModel") {
     dependsOn("createGeneratedSourceFolders")
 
@@ -149,5 +137,5 @@ sourceSets.main.configure {
     kotlin.srcDirs("${layout.buildDirectory.get()}/generated/src/main/kotlin")
 }
 
-tasks.getByName("compileKotlin").dependsOn("generateRestaurantExtractionModel", "generateMenuExtractionModel")
+tasks.getByName("compileKotlin").dependsOn("generateMenuExtractionModel")
 tasks.getByName("afterReleaseBuild").dependsOn("publishImage")

@@ -1,4 +1,4 @@
-package com.github.sipe90.lunchscraper.html
+package com.github.sipe90.lunchscraper.scraping.html
 
 import org.jsoup.internal.StringUtil
 import org.jsoup.nodes.Comment

@@ -1,6 +1,5 @@
 package com.github.sipe90.lunchscraper.tasks
 
-import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
 import com.github.sipe90.lunchscraper.scraping.ScrapeService
 import dev.starry.ktscheduler.job.Job
 import dev.starry.ktscheduler.scheduler.KtScheduler
@@ -11,26 +10,22 @@ private val logger = KotlinLogging.logger {}
 
 @Component
 class ScrapeScheduler(
-    config: LunchScraperConfiguration,
     private val scrapeService: ScrapeService,
 ) {
-    private val cron = config.schedulerConfig.cron
     private val scheduler = KtScheduler()
 
-    fun start() {
-        logger.info { "Starting scheduler" }
-
-        val trigger = CronExpressionTrigger(cron)
-        val job =
-            Job(
-                jobId = "scrape-job",
-                trigger = trigger,
-                runConcurrently = false,
-                callback = ::scrape,
-            )
-
-        scheduler.addJob(job)
+    fun start(schedule: String) {
+        addJob(schedule)
         scheduler.start()
+
+        logger.info { "Starting job with schedule: $schedule. Next run time is at: ${getJob().nextRunTime}." }
+    }
+
+    fun updateSchedule(schedule: String) {
+        removeJob()
+        addJob(schedule)
+
+        logger.info { "Updating job with schedule: $schedule. Next run time is at: ${getJob().nextRunTime}." }
     }
 
     fun pause() {
@@ -53,6 +48,23 @@ class ScrapeScheduler(
     private suspend fun scrape() {
         logger.info { "Starting scheduled scrape" }
         scrapeService.scrapeAllMenus()
-        logger.info { "Finished scheduled scrape" }
+        logger.info { "Finished scheduled scrape. Next run time is at: ${getJob().nextRunTime}." }
     }
+
+    private fun addJob(schedule: String) {
+        val trigger = CronExpressionTrigger(schedule)
+        val job =
+            Job(
+                jobId = "scrape-job",
+                trigger = trigger,
+                runConcurrently = false,
+                callback = ::scrape,
+            )
+
+        scheduler.addJob(job)
+    }
+
+    private fun getJob() = scheduler.getJobs().first()
+
+    private fun removeJob() = scheduler.removeJob(getJob().jobId)
 }

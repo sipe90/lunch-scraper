@@ -34,42 +34,49 @@
             },
             "monday": {
               "type": "array",
+              "description": "Monday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }
             },
             "tuesday": {
               "type": "array",
+              "description": "Tuesday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }
             },
             "wednesday": {
               "type": "array",
+              "description": "Wednesday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }
             },
             "thursday": {
               "type": "array",
+              "description": "Thursday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }
             },
             "friday": {
               "type": "array",
+              "description": "Friday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }
             },
             "saturday": {
               "type": "array",
+              "description": "Saturday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }
             },
             "sunday": {
               "type": "array",
+              "description": "Sunday's menu items. Provide an empty array if menu is not available",
               "items": {
                 "$ref": "#/definitions/menu_item"
               }

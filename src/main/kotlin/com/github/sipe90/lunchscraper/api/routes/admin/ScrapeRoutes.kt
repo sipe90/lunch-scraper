@@ -1,59 +1,30 @@
-package com.github.sipe90.lunchscraper.plugins
+package com.github.sipe90.lunchscraper.api.routes.admin
 
-import com.github.sipe90.lunchscraper.api.MenuService
+import com.github.sipe90.lunchscraper.plugins.springContext
 import com.github.sipe90.lunchscraper.scraping.ScrapeService
-import com.github.sipe90.lunchscraper.tasks.ScrapeScheduler
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respond
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.util.getOrFail
-import kotlinx.coroutines.CancellationException
+import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.launch
 
 private val logger = KotlinLogging.logger {}
 
-fun Application.configureRouting() {
+fun Application.scrapeRoutes() {
     routing {
-        route("/menus") {
-            get("/{locationId}") {
-                val menuService = springContext.getBean(MenuService::class.java)
-                val locationId = call.parameters.getOrFail("locationId")
-
-                val menus = menuService.getLocationMenus(locationId)
-                if (menus == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(menus)
-                }
-            }
-        }
-
         route("/admin") {
             authenticate {
-                route("/scheduler") {
-                    post("/pause") {
-                        val scrapeScheduler = springContext.getBean(ScrapeScheduler::class.java)
-                        scrapeScheduler.pause()
-                        call.respond(HttpStatusCode.OK)
-                    }
-
-                    post("/resume") {
-                        val scrapeScheduler = springContext.getBean(ScrapeScheduler::class.java)
-                        scrapeScheduler.resume()
-                        call.respond(HttpStatusCode.OK)
-                    }
-                }
-
                 route("/scrape") {
                     post {
                         val scrapeService = springContext.getBean(ScrapeService::class.java)
                         logger.info { "Scraping all menus" }
+
                         launch { scrapeService.scrapeAllMenus() }
                             .invokeOnCompletion {
                                 when (it) {
@@ -72,22 +43,22 @@ fun Application.configureRouting() {
                         call.respond(HttpStatusCode.Accepted)
                     }
 
-                    post("/{locationId}") {
+                    post("/{areaId}") {
                         val scrapeService = springContext.getBean(ScrapeService::class.java)
-                        val locationId = call.parameters["locationId"]!!
+                        val areaId = call.parameters.getOrFail("areaId")
 
-                        logger.info { "Scraping all menus for location $locationId" }
-                        launch { scrapeService.scrapeAllLocationMenus(locationId) }
+                        logger.info { "Scraping all menus for area $areaId" }
+                        launch { scrapeService.scrapeAllAreaMenus(areaId) }
                             .invokeOnCompletion {
                                 when (it) {
                                     null -> {
-                                        logger.info { "Finished scraping all menus for: $locationId" }
+                                        logger.info { "Finished scraping all menus for: $areaId" }
                                     }
                                     is CancellationException -> {
-                                        logger.warn(it) { "Scraping cancelled for all menus for: $locationId" }
+                                        logger.warn(it) { "Scraping cancelled for all menus for: $areaId" }
                                     }
                                     else -> {
-                                        logger.error(it) { "Exception thrown while scraping all menus for: $locationId" }
+                                        logger.error(it) { "Exception thrown while scraping all menus for: $areaId" }
                                     }
                                 }
                             }
@@ -95,22 +66,22 @@ fun Application.configureRouting() {
                         call.respond(HttpStatusCode.Accepted)
                     }
 
-                    post("/{locationId}/{restaurantId}") {
+                    post("/{areaId}/{restaurantId}") {
                         val scrapeService = springContext.getBean(ScrapeService::class.java)
-                        val locationId = call.parameters["locationId"]!!
-                        val restaurantId = call.parameters["restaurantId"]!!
+                        val areaId = call.parameters.getOrFail("areaId")
+                        val restaurantId = call.parameters.getOrFail("restaurantId")
 
-                        launch { scrapeService.scrapeRestaurantMenus(locationId, restaurantId) }
+                        launch { scrapeService.scrapeRestaurantMenus(areaId, restaurantId) }
                             .invokeOnCompletion {
                                 when (it) {
                                     null -> {
-                                        logger.info { "Finished scraping menus for: $locationId/$restaurantId" }
+                                        logger.info { "Finished scraping menus for: $areaId/$restaurantId" }
                                     }
                                     is CancellationException -> {
-                                        logger.warn(it) { "Scraping cancelled for: $locationId/$restaurantId" }
+                                        logger.warn(it) { "Scraping cancelled for: $areaId/$restaurantId" }
                                     }
                                     else -> {
-                                        logger.error(it) { "Exception thrown while scraping menus for: $locationId/$restaurantId" }
+                                        logger.error(it) { "Exception thrown while scraping menus for: $areaId/$restaurantId" }
                                     }
                                 }
                             }

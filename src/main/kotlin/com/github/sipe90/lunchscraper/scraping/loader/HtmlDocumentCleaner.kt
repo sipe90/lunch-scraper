@@ -1,58 +1,94 @@
 package com.github.sipe90.lunchscraper.scraping.loader
 
-import org.jsoup.internal.StringUtil
-import org.jsoup.nodes.Comment
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.nodes.Node
-import org.jsoup.nodes.TextNode
-import org.jsoup.select.NodeTraversor
-import org.jsoup.select.NodeVisitor
 
 object HtmlDocumentCleaner {
     fun cleanDocument(doc: Document): String {
-        doc.outputSettings().prettyPrint(false)
+        val body = doc.body() ?: return ""
 
-        val tagsToRemove = listOf("meta", "script", "style", "footer", "nav")
-        val nodesToRemove = mutableListOf<Element>()
+        // Remove script and style elements to reduce clutter
+        body.select("meta, script, style, noscript, footer, nav").remove()
 
-        NodeTraversor.traverse(
-            object : NodeVisitor {
-                override fun head(
-                    node: Node,
-                    depth: Int,
-                ) {
-                    when (node) {
-                        is Comment -> node.remove()
-                        is TextNode -> node.text(trim(node.text()))
-                        is Element ->
-                            if (tagsToRemove.contains(node.tagName())) {
-                                node.remove()
-                            } else {
-                                node.clearAttributes()
-                            }
-                    }
-                }
+        // We'll build the final text representation here
+        val sb = StringBuilder()
 
-                override fun tail(
-                    node: Node,
-                    depth: Int,
-                ) {
-                    if (node is Element) {
-                        val nodeText = trim(node.text())
-                        if (StringUtil.isBlank(nodeText)) {
-                            nodesToRemove.add(node)
-                        }
-                    }
-                }
-            },
-            doc.body(),
-        )
+        // Start from the top-level children in the body
+        body.children().forEach {
+            processElement(it, sb)
+        }
 
-        nodesToRemove.forEach { it.remove() }
-
-        return doc.body().outerHtml()
+        return sb.toString().trim()
     }
 
-    private fun trim(text: String) = text.replace("\u00A0", "").trim()
+    // Recursive function to convert each element into minimal Markdown
+    private fun processElement(
+        element: Element,
+        sb: StringBuilder,
+    ) {
+        when (element.tagName().lowercase()) {
+            "h1" -> {
+                sb
+                    .append("# ")
+                    .append(element.ownText().trim())
+                    .append("\n\n")
+            }
+            "h2" -> {
+                sb
+                    .append("## ")
+                    .append(element.ownText().trim())
+                    .append("\n\n")
+            }
+            "h3" -> {
+                sb
+                    .append("### ")
+                    .append(element.ownText().trim())
+                    .append("\n\n")
+            }
+            "h4" -> {
+                sb
+                    .append("#### ")
+                    .append(element.ownText().trim())
+                    .append("\n\n")
+            }
+            "li" -> {
+                // List item
+                val text = element.ownText().trim()
+                if (text.isNotEmpty()) {
+                    sb
+                        .append("- ")
+                        .append(text)
+                        .append("\n")
+                }
+            }
+            "br" -> {
+                // Line break
+                sb.append("\n")
+            }
+            "p", "div" -> {
+                // Treat paragraphs and generic divs similarly, but separate them with blank lines
+                val text = element.ownText().trim()
+                if (text.isNotEmpty()) {
+                    sb
+                        .append(text)
+                        .append("\n\n")
+                }
+            }
+            else -> {
+                // Default: If this element has its own text, we handle it;
+                // also, we recursively process child elements.
+                val text = element.ownText().trim()
+                if (text.isNotEmpty()) {
+                    sb
+                        .append(text)
+                        .append("\n\n")
+                }
+            }
+        }
+
+        // Process child elements recursively
+        element.children().forEach {
+            processElement(it, sb)
+        }
+    }
 }

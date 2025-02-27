@@ -13,6 +13,9 @@ open class LunchScraperConfiguration(
 
     val mongoDbConfig: MongoDbConfig
         get() = MongoDbConfig(config.config("mongo-db"))
+
+    val settingsConfig: SettingsConfig
+        get() = SettingsConfig(config.config("settings"))
 }
 
 open class MongoDbConfig(
@@ -43,4 +46,17 @@ open class ApiConfig(
 ) {
     val apiKey: String
         get() = config.property("api-key").getString()
+}
+
+open class SettingsConfig(
+    private val config: ApplicationConfig,
+) {
+    val defaultSchedule: String
+        get() = config.property("default-schedule").getString()
+
+    val defaultSystemPrompt: String
+        get() = config.property("default-system-prompt").getString()
+
+    val defaultUserPromptPrefix: String
+        get() = config.property("default-user-prompt-prefix").getString()
 }

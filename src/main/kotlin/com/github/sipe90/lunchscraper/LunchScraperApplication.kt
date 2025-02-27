@@ -8,6 +8,7 @@ import com.github.sipe90.lunchscraper.config.ApiConfig
 import com.github.sipe90.lunchscraper.config.LunchScraperConfiguration
 import com.github.sipe90.lunchscraper.config.MongoDbConfig
 import com.github.sipe90.lunchscraper.config.OpenAiConfig
+import com.github.sipe90.lunchscraper.config.SettingsConfig
 import com.github.sipe90.lunchscraper.plugins.configureSecurity
 import com.github.sipe90.lunchscraper.plugins.configureSerialization
 import com.github.sipe90.lunchscraper.plugins.configureSpringDI
@@ -36,6 +37,7 @@ fun Application.module() {
             it.registerBean<MongoDbConfig> { config.mongoDbConfig }
             it.registerBean<OpenAiConfig> { config.openAiConfig }
             it.registerBean<ApiConfig> { config.apiConfig }
+            it.registerBean<SettingsConfig> { config.settingsConfig }
 
             it.scan("com.github.sipe90.lunchscraper")
             it.refresh()

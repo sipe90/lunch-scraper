@@ -3,31 +3,20 @@ import io.ktor.plugin.features.DockerImageRegistry
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
-val kotlinTestVersion: String by project
-val logbackVersion: String by project
-val springContextVersion: String by project
-
 plugins {
     idea
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.serialization") version "2.0.20"
-    id("io.ktor.plugin") version "3.0.0"
-    id("com.github.node-gradle.node") version "7.0.2"
-    id("net.researchgate.release") version "3.0.2"
-    id("org.jmailen.kotlinter") version "4.4.1"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.node)
+    alias(libs.plugins.release)
+    alias(libs.plugins.kotlinter)
 }
 
 group = "com.github.sipe90"
 
-kotlin {
-    jvmToolchain(21)
-}
-
 application {
-    mainClass.set("io.ktor.server.netty.EngineMain")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    mainClass = "io.ktor.server.netty.EngineMain"
 }
 
 ktor {
@@ -43,6 +32,7 @@ ktor {
             )
         )
     }
+
 }
 
 release {
@@ -56,58 +46,60 @@ repositories {
 
 dependencies {
     // Ktor Server
-    implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.ktor:ktor-server-netty-jvm")
-    implementation("io.ktor:ktor-server-auth-jvm")
-    implementation("io.ktor:ktor-server-config-yaml")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.logback.classic)
+    implementation(libs.ktor.server.config.yaml)
 
     // Ktor Client
-    implementation("io.ktor:ktor-client-core")
-    implementation("io.ktor:ktor-client-cio")
-    implementation("io.ktor:ktor-client-content-negotiation-jvm")
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
 
     // Kotlinx
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+    implementation(libs.kotlinx.datetime)
 
     // DB
-    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.2.0")
-    implementation("org.mongodb:bson-kotlinx:5.2.0")
+    implementation(libs.mongodb.driver.kotlin.coroutine)
+    implementation(libs.bson)
 
     // DI
-    implementation("org.springframework:spring-context:$springContextVersion")
+    implementation(libs.spring.context)
 
     // Task scheduling
-    implementation("com.github.Pool-Of-Tears:KtScheduler:1.1.6")
-    implementation("com.cronutils:cron-utils:9.2.1")
+    implementation(libs.kt.scheduler)
+    implementation(libs.cron.utils)
 
     // OpenAI
-    implementation("com.aallam.openai:openai-client:4.0.1")
+    implementation(libs.openai.client)
 
     // HTML Parsing
-    implementation("org.jsoup:jsoup:1.18.1")
+    implementation(libs.jsoup)
 
     // Logging
-    implementation("io.github.oshai:kotlin-logging-jvm:5.1.4")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation(libs.kotlin.logging.jvm)
+    implementation(libs.logback.classic)
 
     // Test
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinTestVersion")
-    testImplementation("io.ktor:ktor-server-test-host-jvm")
+    testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.kotlin.test.junit)
 }
 
 tasks.withType<LintTask> {
-    this.source = this.source.minus(fileTree("${layout.buildDirectory.get()}/generated")).asFileTree
+    mustRunAfter("generateMenuExtractionModel")
+    exclude { it.file.path.contains("${File.separator}generated${File.separator}") }
 }
 
 tasks.withType<FormatTask> {
-    this.source = this.source.minus(fileTree("${layout.buildDirectory.get()}/generated")).asFileTree
+    exclude { it.file.path.contains("${File.separator}generated${File.separator}") }
 }
 
 node {
     download = true
-    version = "20.17.0"
+    version = "22.19.0"
 }
 
 tasks.register("createGeneratedSourceFolders") {
@@ -127,6 +119,7 @@ tasks.register<NpxTask>("generateMenuExtractionModel") {
     args = listOf(
         "--src-lang", "schema",
         "--out", outputFile,
+        "--lang", "kotlin",
         "--framework", "kotlinx",
         "--package", "com.github.sipe90.lunchscraper.openapi",
         inputFile

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="LunchScraperApplicationKt" type="KtorApplicationConfigurationType" factoryName="Ktor" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="com.github.sipe90.lunchscraper.LunchScraperApplicationKt" />
-    <module name="com.github.sipe90.lunch-scraper.main" />
+    <module name="lunch-scraper.main" />
     <option name="PROGRAM_PARAMETERS" value="-config=application.yaml -config=application-dev.yaml" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <extension name="coverage">

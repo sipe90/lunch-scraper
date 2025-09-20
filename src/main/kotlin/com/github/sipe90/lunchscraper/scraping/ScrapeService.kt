@@ -19,9 +19,10 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
 import org.springframework.stereotype.Service
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 private val logger = KotlinLogging.logger {}
 
@@ -78,6 +79,7 @@ class ScrapeService(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun scrapeRestaurantMenus(
         lunchArea: LunchArea,
         restaurant: Restaurant,

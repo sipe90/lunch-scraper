@@ -3,10 +3,10 @@ package com.github.sipe90.lunchscraper.settings
 import com.github.sipe90.lunchscraper.config.SettingsConfig
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
 import com.github.sipe90.lunchscraper.domain.settings.Settings
-import org.springframework.stereotype.Service
+import io.ktor.server.plugins.di.annotations.Property
 
-@Service
 class SettingsService(
+    @Property("lunch-scraper.settings")
     private val settingsConfig: SettingsConfig,
     private val settingsRepository: SettingsRepository,
 ) {

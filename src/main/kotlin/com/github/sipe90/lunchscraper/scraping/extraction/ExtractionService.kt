@@ -6,9 +6,7 @@ import io.ktor.serialization.kotlinx.json.DefaultJson
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.IOException
 import kotlinx.serialization.json.JsonObject
-import org.springframework.stereotype.Service
 
-@Service
 class ExtractionService(
     private val openAIService: OpenAIService,
 ) {

@@ -9,9 +9,7 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import org.bson.BsonValue
-import org.springframework.stereotype.Repository
 
-@Repository
 class LunchAreaRepositoryImpl(
     private val database: MongoDatabase,
 ) : LunchAreaRepository {

@@ -7,9 +7,7 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.singleOrNull
 import org.bson.BsonValue
-import org.springframework.stereotype.Repository
 
-@Repository
 class MenuScrapeResultRepositoryImpl(
     private val database: MongoDatabase,
 ) : MenuScrapeResultRepository {

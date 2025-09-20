@@ -11,9 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalTime
-import org.springframework.stereotype.Service
 
-@Service
 class MenuApi(
     private val lunchAreaService: LunchAreaService,
     private val scrapeResultService: ScrapeResultService,

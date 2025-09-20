@@ -14,12 +14,12 @@ import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
 import com.github.sipe90.lunchscraper.config.OpenAiConfig
+import io.ktor.server.plugins.di.annotations.Property
 import kotlinx.serialization.json.JsonObject
-import org.springframework.stereotype.Service
 import kotlin.time.Duration.Companion.seconds
 
-@Service
 class OpenAIService(
+    @Property("lunch-scraper.open-ai")
     private val config: OpenAiConfig,
 ) {
     private val openAi =

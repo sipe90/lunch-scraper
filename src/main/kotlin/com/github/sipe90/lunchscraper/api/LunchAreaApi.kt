@@ -8,9 +8,7 @@ import com.github.sipe90.lunchscraper.api.dto.RestaurantUpdate
 import com.github.sipe90.lunchscraper.luncharea.LunchAreaService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.springframework.stereotype.Service
 
-@Service
 class LunchAreaApi(
     private val lunchAreaService: LunchAreaService,
 ) {

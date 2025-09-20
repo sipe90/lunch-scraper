@@ -20,13 +20,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalTime
-import org.springframework.stereotype.Service
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 private val logger = KotlinLogging.logger {}
 
-@Service
 class ScrapeService(
     private val lunchAreaService: LunchAreaService,
     private val scrapeResultService: ScrapeResultService,

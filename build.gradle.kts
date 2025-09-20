@@ -48,6 +48,7 @@ dependencies {
     // Ktor Server
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.server.di)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.netty)
@@ -65,9 +66,7 @@ dependencies {
     // DB
     implementation(libs.mongodb.driver.kotlin.coroutine)
     implementation(libs.bson)
-
-    // DI
-    implementation(libs.spring.context)
+    implementation(libs.bson.kotlinx)
 
     // Task scheduling
     implementation(libs.kt.scheduler)

@@ -4,11 +4,9 @@ import com.github.sipe90.lunchscraper.domain.area.LunchArea
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.Flow
-import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
 
-@Service
 class LunchAreaService(
     private val lunchAreaRepository: LunchAreaRepository,
 ) {

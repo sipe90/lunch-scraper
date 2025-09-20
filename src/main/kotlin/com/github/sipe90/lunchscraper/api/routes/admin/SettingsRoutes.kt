@@ -2,10 +2,10 @@ package com.github.sipe90.lunchscraper.api.routes.admin
 
 import com.github.sipe90.lunchscraper.api.SettingsApi
 import com.github.sipe90.lunchscraper.api.dto.SettingsInput
-import com.github.sipe90.lunchscraper.plugins.springContext
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
+import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
@@ -18,14 +18,14 @@ fun Application.settingsRoutes() {
             authenticate {
                 route("/settings") {
                     get {
-                        val settingsApi = springContext.getBean(SettingsApi::class.java)
+                        val settingsApi: SettingsApi by dependencies
 
                         val settings = settingsApi.getSettings()
                         call.respond(settings)
                     }
 
                     put<SettingsInput> {
-                        val settingsApi = springContext.getBean(SettingsApi::class.java)
+                        val settingsApi: SettingsApi by dependencies
 
                         settingsApi.updateSettings(it)
                         call.respond(HttpStatusCode.OK)

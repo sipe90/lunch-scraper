@@ -4,14 +4,12 @@ import com.github.sipe90.lunchscraper.scraping.ScrapeService
 import dev.starry.ktscheduler.job.Job
 import dev.starry.ktscheduler.scheduler.KtScheduler
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
-@Component
 class ScrapeScheduler(
     private val scrapeService: ScrapeService,
-) {
+) : AutoCloseable {
     private val scheduler = KtScheduler()
 
     fun start(schedule: String) {
@@ -67,4 +65,10 @@ class ScrapeScheduler(
     private fun getJob() = scheduler.getJobs().first()
 
     private fun removeJob() = scheduler.removeJob(getJob().jobId)
+
+    override fun close() {
+        if (isRunning()) {
+            shutdown()
+        }
+    }
 }

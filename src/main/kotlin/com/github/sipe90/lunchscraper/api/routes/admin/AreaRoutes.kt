@@ -5,11 +5,11 @@ import com.github.sipe90.lunchscraper.api.dto.LunchAreaInput
 import com.github.sipe90.lunchscraper.api.dto.LunchAreaUpdate
 import com.github.sipe90.lunchscraper.api.dto.RestaurantInput
 import com.github.sipe90.lunchscraper.api.dto.RestaurantUpdate
-import com.github.sipe90.lunchscraper.plugins.springContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
+import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.response.respond
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
@@ -27,14 +27,14 @@ fun Application.lunchAreaRoutes() {
             authenticate {
                 route("/areas") {
                     get {
-                        val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                        val lunchAreaApi: LunchAreaApi by dependencies
 
                         val areas = lunchAreaApi.getAllLunchAreas()
                         call.respond(areas)
                     }
 
                     post<LunchAreaInput> {
-                        val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                        val lunchAreaApi: LunchAreaApi by dependencies
 
                         lunchAreaApi.createLunchArea(it)
                         call.respond(HttpStatusCode.OK)
@@ -42,7 +42,7 @@ fun Application.lunchAreaRoutes() {
 
                     route("/{areaId}") {
                         put<LunchAreaUpdate> {
-                            val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                            val lunchAreaApi: LunchAreaApi by dependencies
                             val areaId = call.parameters.getOrFail("areaId")
 
                             lunchAreaApi.updateLunchArea(areaId, it)
@@ -50,7 +50,7 @@ fun Application.lunchAreaRoutes() {
                         }
 
                         delete {
-                            val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                            val lunchAreaApi: LunchAreaApi by dependencies
                             val areaId = call.parameters.getOrFail("areaId")
 
                             lunchAreaApi.deleteLunchArea(areaId)
@@ -59,7 +59,7 @@ fun Application.lunchAreaRoutes() {
 
                         route("/restaurants") {
                             post<RestaurantInput> {
-                                val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                                val lunchAreaApi: LunchAreaApi by dependencies
                                 val areaId = call.parameters.getOrFail("areaId")
 
                                 lunchAreaApi.addRestaurant(areaId, it)
@@ -68,7 +68,7 @@ fun Application.lunchAreaRoutes() {
 
                             route("/{restaurantId}") {
                                 put<RestaurantUpdate> {
-                                    val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                                    val lunchAreaApi: LunchAreaApi by dependencies
                                     val areaId = call.parameters.getOrFail("areaId")
                                     val restaurantId = call.parameters.getOrFail("restaurantId")
 
@@ -77,7 +77,7 @@ fun Application.lunchAreaRoutes() {
                                 }
 
                                 delete {
-                                    val lunchAreaApi = springContext.getBean(LunchAreaApi::class.java)
+                                    val lunchAreaApi: LunchAreaApi by dependencies
                                     val areaId = call.parameters.getOrFail("areaId")
                                     val restaurantId = call.parameters.getOrFail("restaurantId")
 

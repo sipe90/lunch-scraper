@@ -6,14 +6,16 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Serializable
-data class MenuScrapeResult @OptIn(ExperimentalTime::class) constructor(
-    val year: Int,
-    val week: Int,
-    val success: Boolean,
-    val areaId: String,
-    val restaurantId: String,
-    val document: String? = null,
-    val documentHash: String,
-    val scrapeTimestamp: Instant,
-    val extractionResult: MenuExtractionResult,
-)
+data class MenuScrapeResult
+    @OptIn(ExperimentalTime::class)
+    constructor(
+        val year: Int,
+        val week: Int,
+        val success: Boolean,
+        val areaId: String,
+        val restaurantId: String,
+        val document: String? = null,
+        val documentHash: String,
+        val scrapeTimestamp: Instant,
+        val extractionResult: MenuExtractionResult,
+    )

@@ -5,9 +5,7 @@ import com.github.sipe90.lunchscraper.domain.area.JsonScrapeParameters
 import com.github.sipe90.lunchscraper.domain.area.ScrapeParameters
 import com.github.sipe90.lunchscraper.scraping.extraction.ExtractionService
 import com.github.sipe90.lunchscraper.settings.SettingsService
-import org.springframework.stereotype.Component
 
-@Component
 class ScraperFactory(
     private val extractionService: ExtractionService,
     private val settingsService: SettingsService,

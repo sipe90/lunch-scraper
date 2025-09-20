@@ -1,11 +1,11 @@
 package com.github.sipe90.lunchscraper.api.routes.admin
 
-import com.github.sipe90.lunchscraper.plugins.springContext
 import com.github.sipe90.lunchscraper.scraping.ScrapeService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
+import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -22,7 +22,7 @@ fun Application.scrapeRoutes() {
             authenticate {
                 route("/scrape") {
                     post {
-                        val scrapeService = springContext.getBean(ScrapeService::class.java)
+                        val scrapeService: ScrapeService by dependencies
                         logger.info { "Scraping all menus" }
 
                         launch { scrapeService.scrapeAllMenus() }
@@ -44,7 +44,7 @@ fun Application.scrapeRoutes() {
                     }
 
                     post("/{areaId}") {
-                        val scrapeService = springContext.getBean(ScrapeService::class.java)
+                        val scrapeService: ScrapeService by dependencies
                         val areaId = call.parameters.getOrFail("areaId")
 
                         logger.info { "Scraping all menus for area $areaId" }
@@ -67,7 +67,7 @@ fun Application.scrapeRoutes() {
                     }
 
                     post("/{areaId}/{restaurantId}") {
-                        val scrapeService = springContext.getBean(ScrapeService::class.java)
+                        val scrapeService: ScrapeService by dependencies
                         val areaId = call.parameters.getOrFail("areaId")
                         val restaurantId = call.parameters.getOrFail("restaurantId")
 

@@ -6,9 +6,7 @@ import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
-import org.springframework.stereotype.Repository
 
-@Repository
 class SettingsRepositoryImpl(
     private val database: MongoDatabase,
 ) : SettingsRepository {

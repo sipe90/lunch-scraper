@@ -1,0 +1,19 @@
+meta {
+  name: Get area menus
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/areas/:areaId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  areaId: area-id
+}
+
+settings {
+  encodeUrl: true
+}

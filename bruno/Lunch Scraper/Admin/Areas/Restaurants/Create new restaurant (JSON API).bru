@@ -1,0 +1,35 @@
+meta {
+  name: Create new restaurant (JSON API)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/admin/areas/:areaId/restaurants
+  body: json
+  auth: inherit
+}
+
+params:path {
+  areaId: area-id
+}
+
+body:json {
+  {
+    "id": "test-json-api-restaurant",
+    "name": "Test JSON API Restaurant",
+    "url": "https://test-json-api-restaurant.com",
+    "parameters": {
+      "type": "json",
+      "httpMethod": "GET",
+      "hint": "Optional hint to add to the prompt",
+      "urlTemplates": [
+        "https://test-json-api-restaurant.com/api/menus"
+      ]
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

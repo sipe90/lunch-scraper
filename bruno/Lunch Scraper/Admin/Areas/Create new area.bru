@@ -1,0 +1,22 @@
+meta {
+  name: Create new area
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/admin/areas
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "area-id",
+    "name": "Area name"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

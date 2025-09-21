@@ -1,0 +1,15 @@
+meta {
+  name: Scrape all areas
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/admin/scrape
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Delete area
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/admin/areas/:areaId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  areaId: area-id
+}
+
+settings {
+  encodeUrl: true
+}

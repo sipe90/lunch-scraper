@@ -1,0 +1,15 @@
+meta {
+  name: Get settings
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/settings
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

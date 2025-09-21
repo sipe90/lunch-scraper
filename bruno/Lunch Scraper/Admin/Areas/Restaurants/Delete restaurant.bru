@@ -1,0 +1,34 @@
+meta {
+  name: Delete restaurant
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/admin/areas/:areaId/restaurants/:restaurantId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  areaId: area-id
+  restaurantId: restaurant-id
+}
+
+body:json {
+  {
+    "name": "Test Html Restaurant",
+    "url": "https://test-html-restaurant.com",
+    "parameters": {
+      "type": "html",
+      "hint": "Optional hint to add to the prompt",
+      "urlTemplates": [
+        "https://test-html-restaurant.com/menus"
+      ]
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

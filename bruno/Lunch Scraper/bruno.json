@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Lunch Scraper",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

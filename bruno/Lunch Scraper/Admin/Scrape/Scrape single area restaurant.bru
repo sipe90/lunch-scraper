@@ -1,0 +1,20 @@
+meta {
+  name: Scrape single area restaurant
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/admin/scrape/:areaId/:restaurantId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  restaurantId: restaurant-id
+  areaId: area-id
+}
+
+settings {
+  encodeUrl: true
+}

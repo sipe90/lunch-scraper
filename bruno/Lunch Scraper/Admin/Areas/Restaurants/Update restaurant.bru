@@ -1,0 +1,34 @@
+meta {
+  name: Update restaurant
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/admin/areas/:areaId/restaurants/:restaurantId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  areaId: area-id
+  restaurantId: restaurant-id
+}
+
+body:json {
+  {
+    "name": "Test Html Restaurant",
+    "url": "https://test-html-restaurant.com",
+    "parameters": {
+      "type": "html",
+      "hint": "Optional hint to add to the prompt",
+      "urlTemplates": [
+        "https://test-html-restaurant.com/menus"
+      ]
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+}

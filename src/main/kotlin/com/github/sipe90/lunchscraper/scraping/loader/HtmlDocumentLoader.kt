@@ -4,14 +4,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 
 object HtmlDocumentLoader {
-    suspend fun loadHtmlDocument(url: String): Document =
+    suspend fun loadHtmlDocument(url: String): String =
         useClient {
-            val html = it.get(url).bodyAsText()
-            Jsoup.parse(html)
+            it.get(url).bodyAsText()
         }
 
     private suspend fun <T> useClient(block: suspend (httpClient: HttpClient) -> T) =

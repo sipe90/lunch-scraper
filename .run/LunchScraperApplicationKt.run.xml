@@ -2,7 +2,7 @@
   <configuration default="false" name="LunchScraperApplicationKt" type="KtorApplicationConfigurationType" factoryName="Ktor" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="com.github.sipe90.lunchscraper.LunchScraperApplicationKt" />
     <module name="lunch-scraper.main" />
-    <option name="PROGRAM_PARAMETERS" value="-config=application.yaml -config=application-dev.yaml" />
+    <option name="PROGRAM_PARAMETERS" value="-ea -config=application.yaml -config=application-dev.yaml" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <extension name="coverage">
       <pattern>
@@ -15,7 +15,7 @@
     <option name="includeProvidedScope" value="false" />
     <option name="mainClass" value="com.github.sipe90.lunchscraper.LunchScraperApplicationKt" />
     <option name="passParentEnvs" value="true" />
-    <option name="programParameters" value="-config=application.yaml -config=application-dev.yaml" />
+    <option name="programParameters" value="-ea -config=application.yaml -config=application-dev.yaml" />
     <option name="shortenCommandLine" />
     <option name="vmParameters" />
     <option name="workingDirectory" value="$ProjectFileDir$" />

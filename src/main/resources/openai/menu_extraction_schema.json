@@ -14,14 +14,16 @@
             "string",
             "null"
           ],
-          "description": "Lunchtime start time in format HH:mm"
+          "format": "time",
+          "description": "Lunch start time"
         },
         "lunchtime_end": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Lunchtime end time in format HH:mm"
+          "format": "time",
+          "description": "Lunch end time"
         },
         "daily_menus": {
           "type": "object",

@@ -75,8 +75,8 @@ dependencies {
     // OpenAI
     implementation(libs.openai.client)
 
-    // HTML Parsing
-    implementation(libs.jsoup)
+    // Flexmark
+    implementation(libs.flexmark)
 
     // Logging
     implementation(libs.kotlin.logging.jvm)

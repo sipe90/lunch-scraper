@@ -25,8 +25,8 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version 
 kt-scheduler = { module = "com.github.Pool-Of-Tears:KtScheduler", version = "1.1.6" }
 cron-utils = { module = "com.cronutils:cron-utils", version = "9.2.1" }
 openai-client = { module = "com.aallam.openai:openai-client", version = "4.0.1" }
-jsoup = { module = "org.jsoup:jsoup", version = "1.21.2" }
 kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version = "7.0.13" }
+flexmark = { module = "com.vladsch.flexmark:flexmark-all", version = "0.64.8" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

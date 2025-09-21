@@ -4,7 +4,7 @@ import com.github.sipe90.lunchscraper.domain.area.HtmlScrapeParameters
 import com.github.sipe90.lunchscraper.domain.settings.ScrapeSettings
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
 import com.github.sipe90.lunchscraper.scraping.extraction.ExtractionService
-import com.github.sipe90.lunchscraper.scraping.loader.HtmlDocumentCleaner
+import com.github.sipe90.lunchscraper.scraping.loader.Html2MdConverter
 import com.github.sipe90.lunchscraper.scraping.loader.HtmlDocumentLoader
 import com.github.sipe90.lunchscraper.util.Utils
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -27,8 +27,9 @@ class HtmlScraper(
                         async {
                             logger.info { "Loading an HTML document from ${it.url}" }
 
-                            HtmlDocumentLoader.loadHtmlDocument(it.url).let {
-                                HtmlDocumentCleaner.cleanDocument(it)
+                            HtmlDocumentLoader.loadHtmlDocument(it.url).let { html ->
+                                logger.info { "Converting HTML document to markdown" }
+                                Html2MdConverter.convertHtmlToMarkdown(html)
                             }
                         }
                     }.awaitAll()

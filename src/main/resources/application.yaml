@@ -13,7 +13,7 @@ lunch-scraper:
   open-ai:
     api-key: ''
     base-url: 'https://api.openai.com/v1/'
-    model: gpt-4o
+    model: gpt-5.1
   settings:
     default-schedule: '0 0 8-15 ? * * *'
     default-system-prompt: "You act as a data extractor.
@@ -22,7 +22,7 @@ lunch-scraper:
       Only extract data of the menus for the specified week and ignore menus for all other weeks.
       Follow instructions in schema description properties.
       If only one menu is found for a non-descriptive day, assume the same menu for all days of the week when lunch is available.
-      If no valid menu for this week is found, output an appropriate error message.
+      If no valid menu for this week is found or any other error(s) occur, include an appropriate error message(s) in the error-property at root of the response.
       You are allowed and encouraged to correct small spelling mistakes in menu item descriptions."
     default-user-prompt-prefix: "Extract information from the following text document(s) and focus on menus for the current week ({{week}}).
       If the document contains menus for multiple restaurants, only extract menus for the restaurant named {{name}}"

@@ -26,6 +26,7 @@ import com.github.sipe90.lunchscraper.settings.SettingsRepository
 import com.github.sipe90.lunchscraper.settings.SettingsRepositoryImpl
 import com.github.sipe90.lunchscraper.settings.SettingsService
 import com.github.sipe90.lunchscraper.tasks.ScrapeScheduler
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStarted
 import io.ktor.server.config.property
@@ -34,6 +35,8 @@ import kotlinx.coroutines.launch
 import java.util.logging.Level
 import java.util.logging.Logger
 
+private val logger = KotlinLogging.logger {}
+
 fun main(args: Array<String>) {
     Logger.getLogger("").level = Level.OFF
     io.ktor.server.netty.EngineMain
@@ -41,7 +44,12 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    val mongoConfig = property<MongoDbConfig>("lunch-scraper.mongo-db")
+    val developmentMode: Boolean = property("ktor.development")
+    if (developmentMode) {
+        logger.warn { "Starting application in development mode" }
+    }
+
+    val mongoConfig: MongoDbConfig = property("lunch-scraper.mongo-db")
 
     dependencies {
         provide { provideMongoClient(mongoConfig.url) }

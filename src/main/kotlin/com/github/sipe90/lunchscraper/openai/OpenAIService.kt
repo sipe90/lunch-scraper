@@ -6,6 +6,7 @@ import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatResponseFormat
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.chat.JsonSchema
+import com.aallam.openai.api.exception.OpenAIException
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.logging.Logger
@@ -14,13 +15,21 @@ import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
 import com.github.sipe90.lunchscraper.config.OpenAiConfig
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.di.annotations.Property
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.JsonObject
 import kotlin.time.Duration.Companion.seconds
+
+private val logger = KotlinLogging.logger {}
 
 class OpenAIService(
     @Property("lunch-scraper.open-ai")
     private val config: OpenAiConfig,
+    @Property("ktor.development")
+    private val developmentMode: Boolean,
 ) {
     private val openAi =
         OpenAI(
@@ -29,7 +38,7 @@ class OpenAIService(
             timeout = Timeout(socket = 60.seconds),
             logging =
                 LoggingConfig(
-                    logLevel = LogLevel.All,
+                    logLevel = if (developmentMode) LogLevel.All else LogLevel.None,
                     logger = Logger.Default,
                 ),
         )
@@ -68,7 +77,41 @@ class OpenAIService(
                     ),
             )
 
-        return openAi.chatCompletion(chatCompletionRequest)
+        return runWithExponentialBackoff {
+            openAi.chatCompletion(chatCompletionRequest)
+        }
+    }
+
+    private suspend fun <T> runWithExponentialBackoff(
+        maxRetries: Int = 5,
+        initialDelayMs: Long = 500L,
+        maxDelayMs: Long = 8_000L,
+        run: suspend () -> T,
+    ): T {
+        var currentDelay = initialDelayMs
+
+        repeat(maxRetries) { attempt ->
+            try {
+                return run()
+            } catch (e: OpenAIException) {
+                val cause = e.cause
+                val status = (cause as? ClientRequestException)?.response?.status
+
+                val isRateLimit = status == HttpStatusCode.TooManyRequests
+                val isLastAttempt = attempt == maxRetries - 1
+
+                if (!isRateLimit || isLastAttempt) {
+                    throw e
+                }
+
+                logger.warn(e) { "Rate limited by OpenAI, retrying in ${currentDelay}ms (attempt ${attempt + 1}/$maxRetries)" }
+
+                delay(currentDelay)
+
+                currentDelay = (currentDelay * 2).coerceAtMost(maxDelayMs)
+            }
+        }
+        error("runWithExponentialBackoff reached an unreachable state")
     }
 
     data class SchemaOptions(

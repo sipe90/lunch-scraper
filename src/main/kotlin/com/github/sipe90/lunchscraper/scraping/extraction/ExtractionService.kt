@@ -19,23 +19,22 @@ class ExtractionService(
     suspend fun extractMenusFromDocument(
         systemMessage: String,
         userMessage: String,
-    ): MenuExtractionResult =
-        coroutineScope {
-            val response =
-                openAIService.createChatCompletion(
-                    listOf(systemMessage),
-                    listOf(userMessage),
-                    OpenAIService.SchemaOptions(
-                        name = "weeks_lunch_menus",
-                        schema = menuExtractionSchema,
-                    ),
-                )
+    ): MenuExtractionResult {
+        val response =
+            openAIService.createChatCompletion(
+                listOf(systemMessage),
+                listOf(userMessage),
+                OpenAIService.SchemaOptions(
+                    name = "weeks_lunch_menus",
+                    schema = menuExtractionSchema,
+                ),
+            )
 
-            val responseMessage =
-                response.choices
-                    .first()
-                    .message.content!!
+        val responseMessage =
+            response.choices
+                .first()
+                .message.content!!
 
-            json.decodeFromString(responseMessage)
-        }
+        return json.decodeFromString(responseMessage)
+    }
 }

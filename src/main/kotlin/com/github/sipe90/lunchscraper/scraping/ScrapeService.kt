@@ -30,26 +30,34 @@ class ScrapeService(
     private val scrapeResultService: ScrapeResultService,
     private val scraperFactory: ScraperFactory,
 ) {
+    /**
+     * Scrapes all restaurants in all areas sequentially.
+     */
     suspend fun scrapeAllMenus() {
         val areas = lunchAreaService.getAllLunchAreas()
         val previousResults = scrapeResultService.getCurrentWeekResults()
 
-        areas
-            .map { l ->
-                val results = previousResults.filter { it.areaId == l.id }
-                scrapeAllAreaMenus(l, results).awaitAll()
-            }.launchIn(CoroutineScope(Dispatchers.Default))
+        areas.collect { area ->
+            val resultsForArea = previousResults.filter { it.areaId == area.id }
+            scrapeAllAreaMenus(area, resultsForArea) // <- sequential inside as well
+        }
     }
 
+    /**
+     * Scrapes all restaurants in a single are sequentially.
+     */
     suspend fun scrapeAllAreaMenus(areaId: String) {
         val area =
             lunchAreaService.getArea(areaId)
                 ?: throw IllegalArgumentException("Area not found")
 
         val previousResults = scrapeResultService.getCurrentWeekResultsForArea(areaId)
-        scrapeAllAreaMenus(area, previousResults).awaitAll()
+        scrapeAllAreaMenus(area, previousResults)
     }
 
+    /**
+     * Scrapes a single restaurant.
+     */
     suspend fun scrapeRestaurantMenus(
         areaId: String,
         restaurantId: String,
@@ -61,19 +69,23 @@ class ScrapeService(
             area.restaurants.find { it.id == restaurantId }
                 ?: throw IllegalArgumentException("Restaurant not found")
 
-        val previousResult = scrapeResultService.getCurrentWeekResultsForAreaAndRestaurant(areaId, restaurantId)
+        val previousResult =
+            scrapeResultService.getCurrentWeekResultsForAreaAndRestaurant(areaId, restaurantId)
+
         scrapeRestaurantMenus(area, restaurant, previousResult)
     }
 
     private suspend fun scrapeAllAreaMenus(
         lunchArea: LunchArea,
         previousResults: Flow<MenuScrapeResult>,
-    ) = coroutineScope {
-        lunchArea.restaurants.map { rs ->
-            async {
-                val previousResult = previousResults.filter { it.areaId == rs.id }.firstOrNull()
-                scrapeRestaurantMenus(lunchArea, rs, previousResult)
-            }
+    ) {
+        for (rs in lunchArea.restaurants) {
+            val previousResult =
+                previousResults
+                    .filter { it.restaurantId == rs.id }
+                    .firstOrNull()
+
+            scrapeRestaurantMenus(lunchArea, rs, previousResult)
         }
     }
 

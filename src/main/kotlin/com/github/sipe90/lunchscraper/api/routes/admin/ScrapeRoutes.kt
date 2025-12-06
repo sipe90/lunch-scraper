@@ -31,9 +31,11 @@ fun Application.scrapeRoutes() {
                                     null -> {
                                         logger.info { "Finished scraping all menus" }
                                     }
+
                                     is CancellationException -> {
                                         logger.warn(it) { "Scraping cancelled for all menus" }
                                     }
+
                                     else -> {
                                         logger.error(it) { "Exception thrown while scraping all menus" }
                                     }
@@ -54,9 +56,11 @@ fun Application.scrapeRoutes() {
                                     null -> {
                                         logger.info { "Finished scraping all menus for: $areaId" }
                                     }
+
                                     is CancellationException -> {
                                         logger.warn(it) { "Scraping cancelled for all menus for: $areaId" }
                                     }
+
                                     else -> {
                                         logger.error(it) { "Exception thrown while scraping all menus for: $areaId" }
                                     }
@@ -77,9 +81,11 @@ fun Application.scrapeRoutes() {
                                     null -> {
                                         logger.info { "Finished scraping menus for: $areaId/$restaurantId" }
                                     }
+
                                     is CancellationException -> {
                                         logger.warn(it) { "Scraping cancelled for: $areaId/$restaurantId" }
                                     }
+
                                     else -> {
                                         logger.error(it) { "Exception thrown while scraping menus for: $areaId/$restaurantId" }
                                     }

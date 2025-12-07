@@ -28,8 +28,6 @@ class SettingsService(
                 ScrapeSettings(
                     enabled = true,
                     schedule = settingsConfig.defaultSchedule,
-                    systemPrompt = settingsConfig.defaultSystemPrompt,
-                    userPromptPrefix = settingsConfig.defaultUserPromptPrefix,
                 ),
         )
 }

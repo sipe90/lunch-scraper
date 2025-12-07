@@ -28,8 +28,4 @@ data class OpenAiConfig(
 data class SettingsConfig(
     @SerialName("default-schedule")
     val defaultSchedule: String,
-    @SerialName("default-system-prompt")
-    val defaultSystemPrompt: String,
-    @SerialName("default-user-prompt-prefix")
-    val defaultUserPromptPrefix: String,
 )

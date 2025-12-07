@@ -4,22 +4,18 @@ import com.github.sipe90.lunchscraper.domain.area.LunchArea
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.github.sipe90.lunchscraper.luncharea.LunchAreaService
+import com.github.sipe90.lunchscraper.openapi.DayOfWeek
 import com.github.sipe90.lunchscraper.openapi.MenuExtractionResult
-import com.github.sipe90.lunchscraper.scraping.scraper.ScraperFactory
+import com.github.sipe90.lunchscraper.openapi.Severity
+import com.github.sipe90.lunchscraper.scraping.extraction.ExtractionService
+import com.github.sipe90.lunchscraper.scraping.loader.LoaderFactory
 import com.github.sipe90.lunchscraper.util.Utils
 import com.github.sipe90.lunchscraper.util.md5
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.datetime.LocalTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -28,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 class ScrapeService(
     private val lunchAreaService: LunchAreaService,
     private val scrapeResultService: ScrapeResultService,
-    private val scraperFactory: ScraperFactory,
+    private val extractionService: ExtractionService,
 ) {
     /**
      * Scrapes all restaurants in all areas sequentially.
@@ -98,9 +94,14 @@ class ScrapeService(
         try {
             logger.info { "Scraping menus for restaurant ${restaurant.id}" }
 
-            val scraper = scraperFactory.create(restaurant.parameters)
-            val document = scraper.loadDocument()
-            val documentHash = document.md5()
+            val params =
+                ScrapeParameters(
+                    name = restaurant.name,
+                )
+
+            val scraper = LoaderFactory.create(restaurant.parameters)
+            val documents = scraper.loadDocuments(params)
+            val documentHash = documents.md5()
 
             if (previousResult != null) {
                 if (previousResult.documentHash == documentHash) {
@@ -112,12 +113,7 @@ class ScrapeService(
                 logger.info { "No previous scrape result found for ${restaurant.id}. Proceeding with scrape." }
             }
 
-            val params =
-                mapOf(
-                    "name" to restaurant.name,
-                )
-
-            var extractionResult = scraper.extractData(document, params)
+            var extractionResult = extractionService.extractMenusFromDocument(documents, params)
 
             try {
                 extractionResult = validateExtractionResult(extractionResult, previousResult?.extractionResult)
@@ -131,7 +127,7 @@ class ScrapeService(
                         success = true,
                         areaId = lunchArea.id,
                         restaurantId = restaurant.id,
-                        document = document,
+                        documents = documents,
                         documentHash = documentHash,
                         scrapeTimestamp = Clock.System.now(),
                         extractionResult = extractionResult,
@@ -146,7 +142,7 @@ class ScrapeService(
                         success = false,
                         areaId = lunchArea.id,
                         restaurantId = restaurant.id,
-                        document = document,
+                        documents = documents,
                         documentHash = documentHash,
                         scrapeTimestamp = Clock.System.now(),
                         extractionResult = extractionResult,
@@ -164,81 +160,30 @@ class ScrapeService(
         extractionResult: MenuExtractionResult,
         previousExtractionResult: MenuExtractionResult?,
     ): MenuExtractionResult {
-        if (extractionResult.errors.isNotEmpty()) {
+        if (extractionResult.errors.any { it.severity === Severity.Error }) {
             throw IllegalStateException("Extraction failed. Model returned errors: ${extractionResult.errors}")
         }
         if (extractionResult.lunchMenus == null) {
             throw IllegalStateException("Extraction failed. Model did not provide explanation")
         }
+        DayOfWeek.entries.forEach { dayOfWeek ->
+            if (extractionResult.lunchMenus.days
+                    .filter { it.dayOfWeek === dayOfWeek }
+                    .size > 1
+            ) {
+                throw IllegalStateException("Extraction failed. Found multiple instances of same day: $dayOfWeek")
+            }
+        }
+
+        // If the current extraction result is missing menu items, but the previous result has them, the previous result is used instead.
+        // This might happen if a restaurant omits menus for past days of the week.
+        val previousResultDayMenus = previousExtractionResult?.lunchMenus?.days?.associateBy { it.dayOfWeek } ?: emptyMap()
+        val dayMenus = extractionResult.lunchMenus.days.associateBy { it.dayOfWeek }
+
+        val mergedDayMenus = previousResultDayMenus + dayMenus
 
         return extractionResult.copy(
-            lunchMenus =
-                extractionResult.lunchMenus.let { lunchMenus ->
-                    lunchMenus.copy(
-                        // Since structured output's JSON schema does not (yet) support string format, we'll have to validate the start and end times.
-                        // https://platform.openai.com/docs/guides/structured-outputs/some-type-specific-keywords-are-not-yet-supported
-                        lunchtimeStart =
-                            lunchMenus.lunchtimeStart?.let { lunchtimeStart ->
-                                runCatching { LocalTime.parse(lunchtimeStart) }.fold(
-                                    onSuccess = { lunchtimeStart },
-                                    onFailure = {
-                                        logger.warn(it) { "Failed to parse lunch start time $lunchtimeStart" }
-                                        null
-                                    },
-                                )
-                            },
-                        lunchtimeEnd =
-                            lunchMenus.lunchtimeEnd?.let { lunchtimeEnd ->
-                                runCatching { LocalTime.parse(lunchtimeEnd) }.fold(
-                                    onSuccess = { lunchtimeEnd },
-                                    onFailure = {
-                                        logger.warn(it) { "Failed to parse lunch end time $lunchtimeEnd" }
-                                        null
-                                    },
-                                )
-                            },
-                        // If the current extraction result is missing menu items, but the previous result has them, the previous result is used instead.
-                        // This might happen if a restaurant omits menus for past days of the week.
-                        dailyMenus =
-                            lunchMenus.dailyMenus.copy(
-                                monday =
-                                    lunchMenus.dailyMenus.monday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.monday
-                                            ?: emptyList()
-                                    },
-                                tuesday =
-                                    lunchMenus.dailyMenus.tuesday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.tuesday
-                                            ?: emptyList()
-                                    },
-                                wednesday =
-                                    lunchMenus.dailyMenus.wednesday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.wednesday
-                                            ?: emptyList()
-                                    },
-                                thursday =
-                                    lunchMenus.dailyMenus.thursday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.thursday
-                                            ?: emptyList()
-                                    },
-                                friday =
-                                    lunchMenus.dailyMenus.friday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.friday
-                                            ?: emptyList()
-                                    },
-                                saturday =
-                                    lunchMenus.dailyMenus.saturday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.saturday
-                                            ?: emptyList()
-                                    },
-                                sunday =
-                                    lunchMenus.dailyMenus.sunday.ifEmpty {
-                                        previousExtractionResult?.lunchMenus?.dailyMenus?.sunday
-                                            ?: emptyList()
-                                    },
-                            ),
-                    )
-                },
+            lunchMenus = extractionResult.lunchMenus.copy(days = mergedDayMenus.values.toList()),
         )
     }
 }

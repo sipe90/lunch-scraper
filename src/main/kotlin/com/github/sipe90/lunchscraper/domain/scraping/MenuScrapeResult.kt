@@ -14,7 +14,7 @@ data class MenuScrapeResult
         val success: Boolean,
         val areaId: String,
         val restaurantId: String,
-        val document: String? = null,
+        val documents: List<String>? = null,
         val documentHash: String,
         val scrapeTimestamp: Instant,
         val extractionResult: MenuExtractionResult,

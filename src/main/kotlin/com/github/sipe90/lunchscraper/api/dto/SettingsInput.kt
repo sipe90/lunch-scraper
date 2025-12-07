@@ -22,8 +22,6 @@ data class SettingsInput(
                 ScrapeSettings(
                     enabled = scrape.enabled,
                     schedule = scrape.schedule,
-                    systemPrompt = scrape.systemPrompt,
-                    userPromptPrefix = scrape.userPromptPrefix,
                 ),
         )
 }

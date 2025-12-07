@@ -6,6 +6,8 @@ import com.github.sipe90.lunchscraper.domain.area.LunchArea
 import com.github.sipe90.lunchscraper.domain.area.Restaurant
 import com.github.sipe90.lunchscraper.domain.scraping.MenuScrapeResult
 import com.github.sipe90.lunchscraper.luncharea.LunchAreaService
+import com.github.sipe90.lunchscraper.openapi.DayOfWeek
+import com.github.sipe90.lunchscraper.openapi.MenuForASingleDay
 import com.github.sipe90.lunchscraper.scraping.ScrapeResultService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -35,17 +37,34 @@ class MenuApi(
 
     private fun MenuScrapeResult?.toMenusDto(restaurant: Restaurant): MenusOutput.Restaurant =
         if (this != null) {
-            extractionResult.lunchMenus!!.let {
+            extractionResult.lunchMenus!!.let { menus ->
                 MenusOutput.Restaurant(
                     name = restaurant.name,
                     url = restaurant.url,
                     location = null,
-                    lunchtimeStart = it.lunchtimeStart?.let(LocalTime::parse),
-                    lunchtimeEnd = it.lunchtimeEnd?.let(LocalTime::parse),
-                    dailyMenus = it.dailyMenus,
+                    dailyMenus =
+                        MenusOutput.DailyMenus(
+                            monday = menus.days.find { it.dayOfWeek == DayOfWeek.Monday }?.toMenusDto(),
+                            tuesday = menus.days.find { it.dayOfWeek == DayOfWeek.Tuesday }?.toMenusDto(),
+                            wednesday = menus.days.find { it.dayOfWeek == DayOfWeek.Wednesday }?.toMenusDto(),
+                            thursday = menus.days.find { it.dayOfWeek == DayOfWeek.Thursday }?.toMenusDto(),
+                            friday = menus.days.find { it.dayOfWeek == DayOfWeek.Friday }?.toMenusDto(),
+                            saturday = menus.days.find { it.dayOfWeek == DayOfWeek.Saturday }?.toMenusDto(),
+                            sunday = menus.days.find { it.dayOfWeek == DayOfWeek.Sunday }?.toMenusDto(),
+                        ),
                 )
             }
         } else {
             MenusOutput.Restaurant(name = restaurant.name, url = restaurant.url)
         }
+
+    private fun MenuForASingleDay.toMenusDto(): MenusOutput.DayMenu =
+        MenusOutput.DayMenu(
+            buffetPrice = buffetPrice,
+            dayOfWeek = dayOfWeek,
+            items = items,
+            lunchtimeEnd = lunchtimeEnd?.let(LocalTime::parse),
+            lunchtimeStart = lunchtimeStart?.let(LocalTime::parse),
+            menuType = menuType,
+        )
 }

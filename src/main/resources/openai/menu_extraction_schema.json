@@ -3,90 +3,58 @@
   "additionalProperties": false,
   "properties": {
     "lunch_menus": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "description": "Extracted lunch menus. Can be null if extraction failed. In that case, provide errors in the corresponding attribute.",
+      "type": ["object", "null"],
+      "description": "Extracted lunch menus for the current week from the restaurant's website. Use null ONLY if no reliable menu information for any day of the week can be extracted.",
+      "additionalProperties": false,
       "properties": {
-        "lunchtime_start": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "time",
-          "description": "Lunch start time"
-        },
-        "lunchtime_end": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "time",
-          "description": "Lunch end time"
-        },
-        "daily_menus": {
-          "type": "object",
-          "properties": {
-            "menu_type": {
-              "$ref":"#/definitions/menu_type"
-            },
-            "buffet_price": {
-              "$ref":"#/definitions/buffet_price"
-            },
-            "monday": {
-              "type": "array",
-              "description": "Monday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            },
-            "tuesday": {
-              "type": "array",
-              "description": "Tuesday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            },
-            "wednesday": {
-              "type": "array",
-              "description": "Wednesday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            },
-            "thursday": {
-              "type": "array",
-              "description": "Thursday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            },
-            "friday": {
-              "type": "array",
-              "description": "Friday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            },
-            "saturday": {
-              "type": "array",
-              "description": "Saturday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            },
-            "sunday": {
-              "type": "array",
-              "description": "Sunday's menu items. Provide an empty array if menu is not available",
-              "items": {
-                "$ref": "#/definitions/menu_item"
-              }
-            }
+        "days": {
+          "type": "array",
+          "title": "Menus for each day of the week",
+          "description": "List of menus for the current week. Include at most one entry per day_of_week. If the restaurant is closed or the lunch menu is clearly not available for a day, you must omit that day from the array.",
+          "items": {
+            "$ref": "#/definitions/day_menu"
+          }
+        }
+      },
+      "required": ["days"]
+    },
+    "errors": {
+      "type": "array",
+      "title": "Error list",
+      "description": "Any errors that occurred during data extraction. If no errors occurred, return an empty array.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the error in English."
           },
-          "required": [
-            "menu_type",
-            "buffet_price",
+          "severity": {
+            "type": "string",
+            "description": "Severity level of the error.",
+            "enum": ["info", "warning", "error"]
+          },
+          "source": {
+            "type": "string",
+            "description": "Component or phase where the error occurred (e.g. 'menu_item', 'lunch_times', 'prices', 'tags', 'parsing')."
+          }
+        },
+        "required": ["message"]
+      }
+    }
+  },
+  "required": ["lunch_menus", "errors"],
+  "definitions": {
+    "day_menu": {
+      "type": "object",
+      "title": "Menu for a single day",
+      "additionalProperties": false,
+      "properties": {
+        "day_of_week": {
+          "type": "string",
+          "description": "Day of the week this menu applies to. Do not repeat the same day_of_week more than once.",
+          "enum": [
             "monday",
             "tuesday",
             "wednesday",
@@ -94,89 +62,137 @@
             "friday",
             "saturday",
             "sunday"
-          ],
-          "additionalProperties": false
+          ]
+        },
+        "lunchtime_start": {
+          "type": ["string", "null"],
+          "format": "time",
+          "description": "Start of lunch service for this day as a time string (e.g. '11:00'). Use null if the lunch start time cannot be determined."
+        },
+        "lunchtime_end": {
+          "type": ["string", "null"],
+          "format": "time",
+          "description": "End of lunch service for this day as a time string (e.g. '14:00'). Use null if the lunch end time cannot be determined."
+        },
+        "menu_type": {
+          "$ref": "#/definitions/menu_type"
+        },
+        "buffet_price": {
+          "$ref": "#/definitions/buffet_price"
+        },
+        "items": {
+          "type": "array",
+          "title": "Menu items for the day",
+          "description": "List of lunch menu items for this day. If the restaurant is closed or has no lunch menu for this day, use an empty array.",
+          "items": {
+            "$ref": "#/definitions/menu_item"
+          }
         }
       },
       "required": [
-        "daily_menus",
+        "day_of_week",
         "lunchtime_start",
-        "lunchtime_end"
-      ],
-      "additionalProperties": false
-    },
-    "errors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Any errors occurred during data extraction as freeform text"
-    }
-  },
-  "required": [
-    "lunch_menus",
-    "errors"
-  ],
-  "definitions": {
-    "menu_type": {
-      "type": "string",
-      "enum": [
-        "buffet",
-        "a_la_carte"
+        "lunchtime_end",
+        "menu_type",
+        "buffet_price",
+        "items"
       ]
     },
+    "menu_type": {
+      "title": "Menu type",
+      "description": "Menu type for this day. Use 'buffet' when the page describes a lunch buffet or a fixed-price self-service lunch. Use 'a_la_carte' when customers order and pay for individual dishes from a menu.",
+      "type": "string",
+      "enum": ["buffet", "a_la_carte"]
+    },
     "buffet_price": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "Buffet price. Null if menu_type is not 'buffet'"
+      "title": "Buffet price",
+      "description": "Buffet price for this day as a numeric value without currency symbols (e.g. 12.5). Use null if menu_type is not 'buffet' or if no buffet price is clearly specified.",
+      "type": ["number", "null"]
     },
     "menu_item": {
       "type": "object",
+      "title": "Menu item",
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the menu item. Omit allergens from the string."
+          "title": "Menu item name",
+          "description": "Name of the menu item as shown to the customer, but with allergen codes removed."
         },
         "description": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "Description of the menu item. Omit allergens from the string."
+          "type": ["string", "null"],
+          "title": "Menu item description",
+          "description": "Optional description of the item. Include meaningful details about ingredients or style, but omit allergen codes and technical labels."
         },
         "price": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "Price of the menu item. Null if this is a buffet menu item."
+          "type": ["number", "null"],
+          "title": "Menu item price",
+          "description": "Price of the menu item as a number, without currency symbols. If several prices are listed (e.g. lunch vs regular), choose the standard adult price if obvious. Use null for buffet items or when no clear per-item price is given."
         },
-        "diets": {
+        "tags": {
           "type": "array",
-          "description": "Diets and allergens related to the menu item.",
+          "title": "Menu item tags",
+          "description": "Standardized tags inferred from the dish name, description, allergens and restaurant-specific labels. Only use a tag if it is clearly supported by the information.",
           "items": {
             "type": "string",
             "enum": [
               "vegetarian",
               "vegan",
-              "low_lactose",
+              "pescatarian",
+              "halal",
+
               "gluten_free",
               "lactose_free",
               "dairy_free",
-              "nut_free"
+              "nut_free",
+              "egg_free",
+              "soy_free",
+              "fish_free",
+              "shellfish_free",
+
+              "soup",
+              "salad",
+              "burger",
+              "pizza",
+              "pasta",
+              "curry",
+              "stew",
+              "rice_bowl",
+              "taco",
+              "wrap",
+              "sandwich",
+              "kebab",
+              "wings",
+              "sushi",
+
+              "italian",
+              "french",
+              "nordic",
+              "american",
+              "mexican",
+              "indian",
+              "nepalese",
+              "thai",
+              "chinese",
+              "japanese",
+              "korean",
+
+              "beef",
+              "pork",
+              "chicken",
+              "fish",
+              "seafood",
+              "lamb",
+              "tofu",
+              "halloumi",
+              "falafel",
+              "legumes",
+              "game"
             ]
           }
         }
       },
-      "required": [
-        "name",
-        "description",
-        "price",
-        "diets"
-      ]
+      "required": ["name", "description", "price", "tags"]
     }
   }
 }

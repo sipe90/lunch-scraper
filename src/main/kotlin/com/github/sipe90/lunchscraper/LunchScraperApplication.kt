@@ -20,8 +20,7 @@ import com.github.sipe90.lunchscraper.scraping.MenuScrapeResultRepository
 import com.github.sipe90.lunchscraper.scraping.MenuScrapeResultRepositoryImpl
 import com.github.sipe90.lunchscraper.scraping.ScrapeResultService
 import com.github.sipe90.lunchscraper.scraping.ScrapeService
-import com.github.sipe90.lunchscraper.scraping.extraction.ExtractionService
-import com.github.sipe90.lunchscraper.scraping.scraper.ScraperFactory
+import com.github.sipe90.lunchscraper.scraping.extraction.OpenAIExtractionService
 import com.github.sipe90.lunchscraper.settings.SettingsRepository
 import com.github.sipe90.lunchscraper.settings.SettingsRepositoryImpl
 import com.github.sipe90.lunchscraper.settings.SettingsService
@@ -66,10 +65,9 @@ fun Application.module() {
         provide(LunchAreaService::class)
         provide(OpenAIService::class)
         provide(SettingsService::class)
-        provide(ExtractionService::class)
+        provide(OpenAIExtractionService::class)
         provide(ScrapeResultService::class)
         provide(ScrapeService::class)
-        provide(ScraperFactory::class)
         provide(ScrapeScheduler::class)
     }
 

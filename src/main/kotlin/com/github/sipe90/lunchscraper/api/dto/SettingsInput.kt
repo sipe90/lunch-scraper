@@ -12,8 +12,6 @@ data class SettingsInput(
     data class ScrapeSettingsInput(
         val enabled: Boolean,
         val schedule: String,
-        val systemPrompt: String,
-        val userPromptPrefix: String,
     )
 
     fun toDomain(): Settings =

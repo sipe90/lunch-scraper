@@ -14,13 +14,12 @@ body:json {
   {
     "scrape": {
       "enabled": true,
-      "schedule": "0 0 8-15 ? * * *",
-      "systemPrompt": "You act as a data extractor.\nYou process text documents scraped off from a restaurant's website and produce a JSON document containing the current week's lunch menu.\nUse the same language as the one used in the documents.\nOnly extract data of the menus for the specified week and ignore menus for all other weeks.\nFollow instructions in schema description properties.\nIf only one menu is found for a non-descriptive day, assume the same menu for all days of the week when lunch is available.\nIf no valid menu for this week is found, output an appropriate error message.\nYou are allowed and encouraged to correct small spelling mistakes in menu item descriptions.",
-      "userPromptPrefix": "Extract information from the following text document(s) and focus on menus for the current week ({{week}}).\nIf the document contains menus for multiple restaurants, only extract menus for the restaurant named {{name}}"
+      "schedule": "0 0 8-15 ? * * *"
     }
   }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

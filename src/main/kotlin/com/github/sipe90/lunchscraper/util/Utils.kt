@@ -3,7 +3,7 @@ package com.github.sipe90.lunchscraper.util
 import java.io.IOException
 import java.time.LocalDate
 import java.time.Year
-import java.time.temporal.ChronoField
+import java.time.temporal.IsoFields
 
 object Utils {
     fun readFileToString(path: String): String =
@@ -13,7 +13,7 @@ object Utils {
 
     fun getCurrentYear(): Int = Year.now().value
 
-    fun getCurrentWeek(): Int = LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR)
+    fun getCurrentWeek(): Int = LocalDate.now().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 
     fun getIsoDate(): String = LocalDate.now().toString()
 

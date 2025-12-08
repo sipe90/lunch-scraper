@@ -24,7 +24,15 @@ class OpenAIExtractionService(
         documents: List<String>,
         parameters: ScrapeParameters,
     ): MenuExtractionResult {
-        val userPromptTemplateWithDocuments = userPromptTemplate.replace("{{documents}}", documents.joinToString("\n---\n"))
+        val inlinedDocuments =
+            documents
+                .mapIndexed {
+                    index,
+                    document,
+                    ->
+                    "--- DOCUMENT ${index + 1} START ---\n${document}\n--- DOCUMENT ${index + 1} END ---"
+                }.joinToString("\n")
+        val userPromptTemplateWithDocuments = userPromptTemplate.replace("{{documents}}", inlinedDocuments)
         val userPrompt = Utils.replacePlaceholders(userPromptTemplateWithDocuments, parameters.toMap())
 
         val response =

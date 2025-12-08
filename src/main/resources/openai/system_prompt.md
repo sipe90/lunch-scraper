@@ -63,3 +63,5 @@ Errors:
 - Use `severity` ("info", "warning", "error") and `source` when identifiable.
 - If no errors occurred, return an empty `errors` array.
 - If no reliable lunch menu for any day of the specified week can be extracted, set `lunch_menus` to null and explain the issue in `errors`.
+
+Before producing the final JSON, verify that every value in every enum field exactly matches one of the allowed enum values defined in the schema. If any value does not match exactly, remove it instead of inventing a new value.

@@ -132,7 +132,7 @@
         "tags": {
           "type": "array",
           "title": "Menu item tags",
-          "description": "Standardized tags inferred from the dish name, description, allergens and restaurant-specific labels. Only use a tag if it is clearly supported by the information.",
+          "description": "Standardized tags inferred from the dish name, description, allergens and restaurant-specific labels. Choose zero or more values ONLY from the enum. If a concept is present in the text but no matching enum value exists (for example 'nuts', 'contains nuts', or 'with nuts'), DO NOT add any tag for it. Never invent new tags, synonyms, or variations. If unsure, omit the tag.",
           "items": {
             "type": "string",
             "enum": [

@@ -3,6 +3,7 @@ package com.github.sipe90.lunchscraper.api.dto
 import com.github.sipe90.lunchscraper.openapi.DayOfWeek
 import com.github.sipe90.lunchscraper.openapi.MenuItem
 import com.github.sipe90.lunchscraper.openapi.MenuType
+import com.github.sipe90.lunchscraper.openapi.TagsRelatedToTheMenuItem
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 
@@ -10,6 +11,7 @@ import kotlinx.serialization.Serializable
 data class MenusOutput(
     val lunchArea: LunchArea,
     val restaurants: List<Restaurant>,
+    val tags: TagsRelatedToTheMenuItem,
 ) {
     @Serializable
     data class LunchArea(

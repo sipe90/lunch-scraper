@@ -2,7 +2,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "lunch_menus": {
+    "lunchMenus": {
       "type": ["object", "null"],
       "description": "Extracted lunch menus for the current week from the restaurant's website. Use null ONLY if no reliable menu information for any day of the week can be extracted.",
       "additionalProperties": false,
@@ -10,9 +10,9 @@
         "days": {
           "type": "array",
           "title": "Menus for each day of the week",
-          "description": "List of menus for the current week. Include at most one entry per day_of_week. If the restaurant is closed or the lunch menu is clearly not available for a day, you must omit that day from the array.",
+          "description": "List of menus for the current week. Include at most one entry per dayOfWeek. If the restaurant is closed or the lunch menu is clearly not available for a day, you must omit that day from the array.",
           "items": {
-            "$ref": "#/definitions/day_menu"
+            "$ref": "#/definitions/dayMenu"
           }
         }
       },
@@ -37,23 +37,23 @@
           },
           "source": {
             "type": "string",
-            "description": "Component or phase where the error occurred (e.g. 'menu_item', 'lunch_times', 'prices', 'tags', 'parsing')."
+            "description": "Component or phase where the error occurred (e.g. 'menuItem', 'lunchTimes', 'prices', 'tags', 'parsing')."
           }
         },
         "required": ["message"]
       }
     }
   },
-  "required": ["lunch_menus", "errors"],
+  "required": ["lunchMenus", "errors"],
   "definitions": {
-    "day_menu": {
+    "dayMenu": {
       "type": "object",
       "title": "Menu for a single day",
       "additionalProperties": false,
       "properties": {
-        "day_of_week": {
+        "dayOfWeek": {
           "type": "string",
-          "description": "Day of the week this menu applies to. Do not repeat the same day_of_week more than once.",
+          "description": "Day of the week this menu applies to. Do not repeat the same dayOfWeek more than once.",
           "enum": [
             "monday",
             "tuesday",
@@ -64,52 +64,52 @@
             "sunday"
           ]
         },
-        "lunchtime_start": {
+        "lunchtimeStart": {
           "type": ["string", "null"],
           "format": "time",
           "description": "Start of lunch service for this day as a time string (e.g. '11:00'). Use null if the lunch start time cannot be determined."
         },
-        "lunchtime_end": {
+        "lunchtimeEnd": {
           "type": ["string", "null"],
           "format": "time",
           "description": "End of lunch service for this day as a time string (e.g. '14:00'). Use null if the lunch end time cannot be determined."
         },
-        "menu_type": {
-          "$ref": "#/definitions/menu_type"
+        "menuType": {
+          "$ref": "#/definitions/menuType"
         },
-        "buffet_price": {
-          "$ref": "#/definitions/buffet_price"
+        "buffetPrice": {
+          "$ref": "#/definitions/buffetPrice"
         },
         "items": {
           "type": "array",
           "title": "Menu items for the day",
           "description": "List of lunch menu items for this day. If the restaurant is closed or has no lunch menu for this day, use an empty array.",
           "items": {
-            "$ref": "#/definitions/menu_item"
+            "$ref": "#/definitions/menuItem"
           }
         }
       },
       "required": [
-        "day_of_week",
-        "lunchtime_start",
-        "lunchtime_end",
-        "menu_type",
-        "buffet_price",
+        "dayOfWeek",
+        "lunchtimeStart",
+        "lunchtimeEnd",
+        "menuType",
+        "buffetPrice",
         "items"
       ]
     },
-    "menu_type": {
+    "menuType": {
       "title": "Menu type",
-      "description": "Menu type for this day. Use 'buffet' when the page describes a lunch buffet or a fixed-price self-service lunch. Use 'a_la_carte' when customers order and pay for individual dishes from a menu.",
+      "description": "Menu type for this day. Use 'buffet' when the page describes a lunch buffet or a fixed-price self-service lunch. Use 'aLaCarte' when customers order and pay for individual dishes from a menu.",
       "type": "string",
-      "enum": ["buffet", "a_la_carte"]
+      "enum": ["buffet", "aLaCarte"]
     },
-    "buffet_price": {
+    "buffetPrice": {
       "title": "Buffet price",
-      "description": "Buffet price for this day as a numeric value without currency symbols (e.g. 12.5). Use null if menu_type is not 'buffet' or if no buffet price is clearly specified.",
+      "description": "Buffet price for this day as a numeric value without currency symbols (e.g. 12.5). Use null if menuType is not 'buffet' or if no buffet price is clearly specified.",
       "type": ["number", "null"]
     },
-    "menu_item": {
+    "menuItem": {
       "type": "object",
       "title": "Menu item",
       "additionalProperties": false,
@@ -117,12 +117,12 @@
         "name": {
           "type": "string",
           "title": "Menu item name",
-          "description": "Name of the menu item as shown to the customer, but with allergen codes removed."
+          "description": "Name of the menu item as shown to the customer, with allergen codes removed from the final text. However, you MUST still use any allergen codes or labels that appear with the original name to populate the allergen tags before you remove them from the name."
         },
         "description": {
           "type": ["string", "null"],
           "title": "Menu item description",
-          "description": "Optional description of the item. Include meaningful details about ingredients or style, but omit allergen codes and technical labels."
+          "description": "Optional description of the item. Include meaningful details about ingredients or style, but omit allergen codes and technical labels from the final text. You MUST still read and interpret those codes or labels (before removing them) when deciding which allergen tags to add."
         },
         "price": {
           "type": ["number", "null"],
@@ -130,66 +130,110 @@
           "description": "Price of the menu item as a number, without currency symbols. If several prices are listed (e.g. lunch vs regular), choose the standard adult price if obvious. Use null for buffet items or when no clear per-item price is given."
         },
         "tags": {
-          "type": "array",
-          "title": "Menu item tags",
-          "description": "Standardized tags inferred from the dish name, description, allergens and restaurant-specific labels. Choose zero or more values ONLY from the enum. If a concept is present in the text but no matching enum value exists (for example 'nuts', 'contains nuts', or 'with nuts'), DO NOT add any tag for it. Never invent new tags, synonyms, or variations. If unsure, omit the tag.",
-          "items": {
-            "type": "string",
-            "enum": [
-              "vegetarian",
-              "vegan",
-              "pescatarian",
-              "halal",
-
-              "gluten_free",
-              "lactose_free",
-              "dairy_free",
-              "nut_free",
-              "egg_free",
-              "soy_free",
-              "fish_free",
-              "shellfish_free",
-
-              "soup",
-              "salad",
-              "burger",
-              "pizza",
-              "pasta",
-              "curry",
-              "stew",
-              "rice_bowl",
-              "taco",
-              "wrap",
-              "sandwich",
-              "kebab",
-              "wings",
-              "sushi",
-
-              "italian",
-              "french",
-              "nordic",
-              "american",
-              "mexican",
-              "indian",
-              "nepalese",
-              "thai",
-              "chinese",
-              "japanese",
-              "korean",
-
-              "beef",
-              "pork",
-              "chicken",
-              "fish",
-              "seafood",
-              "lamb",
-              "tofu",
-              "halloumi",
-              "falafel",
-              "legumes",
-              "game"
-            ]
-          }
+          "type": "object",
+          "title": "Tags related to the menu item",
+          "additionalProperties": false,
+          "properties": {
+            "diet": {
+              "type": "array",
+              "title": "Diet tags",
+              "description": "Standardized diet tags inferred from the dish name, description, allergens and restaurant-specific labels. Choose zero or more values ONLY from the enum. If a concept is present in the text but no matching enum value exists DO NOT add any tag for it. Never invent new tags, synonyms, or variations. If unsure, omit the tag.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "vegetarian",
+                  "vegan",
+                  "pescatarian",
+                  "halal"
+                ]
+              }
+            },
+            "allergen": {
+              "type": "array",
+              "title": "Allergen tags",
+              "description": "Standardized allergen tags inferred from the dish name, description, allergens and restaurant-specific labels.\n\nUse the following rules:\n- These tags always mean that the dish is free from that allergen (for example, glutenFree means the dish is gluten-free).\n- You MUST actively look for allergen information and add tags whenever it is clearly present.\n- Explicit evidence includes:\n  - Words or phrases in ANY language that clearly mean 'X-free' (for example, local-language equivalents of 'gluten free', 'lactose free', 'dairy free', 'nut free', 'egg free', 'soy free', 'fish free', 'shellfish free').\n  - Standardized allergen icons, symbols or letter codes used on restaurant menus (for example, capital letters or short codes in parentheses after a dish) when, according to your general knowledge of restaurant allergen labelling, they indicate that the dish is free from a specific allergen, even if the legend or key is not shown in the document.\n\nWhen such labels, icons, symbols or codes are present, treat them as clear and explicit evidence and ADD the corresponding allergen tags. This is not considered guessing.\n\nDo NOT infer allergen tags based only on cuisine, typical recipes or assumptions without any explicit label, icon, symbol, code or wording.\n\nIf allergen labels, icons or codes are present but you cannot confidently map them to the enum values, leave the array empty for that dish AND record a warning in the errors array describing which labels you could not map.\n\nChoose zero or more values ONLY from the enum. Never invent new enum values. If there is no explicit allergen-related label, icon, symbol, code or wording, omit the allergen tags.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "glutenFree",
+                  "lactoseFree",
+                  "dairyFree",
+                  "nutFree",
+                  "eggFree",
+                  "soyFree",
+                  "fishFree",
+                  "shellfishFree"
+                ]
+              }
+            },
+            "dishType": {
+              "type": "array",
+              "title": "Dish type tags",
+              "description": "Standardized dish type tags inferred from the dish name, description, allergens and restaurant-specific labels. Choose zero or more values ONLY from the enum. If a concept is present in the text but no matching enum value exists, DO NOT add any tag for it. Never invent new tags, synonyms, or variations. If unsure, omit the tag.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "soup",
+                  "salad",
+                  "burger",
+                  "pizza",
+                  "pasta",
+                  "curry",
+                  "stew",
+                  "riceBowl",
+                  "taco",
+                  "wrap",
+                  "sandwich",
+                  "kebab",
+                  "wings",
+                  "sushi"
+                ]
+              }
+            },
+            "cuisine": {
+              "type": "array",
+              "title": "Cuisine tags",
+              "description": "Standardized cuisine tags inferred from the dish name, description, allergens and restaurant-specific labels.\n\nUse ONLY the enum values listed below. Never invent new cuisine values, even if they look like good categories (for example, do NOT output values like 'asian', 'latinAmerican', 'european', 'scandinavian', etc. because they are not in the enum).\n\nIf the text suggests a cuisine but there is no EXACT match in the enum (for example 'Asian', 'Mediterranean'), leave the cuisine array EMPTY or omit that specific cuisine instead of creating a new value.\n\nYou may only add a cuisine tag when you are confident that it matches one of the enum values EXACTLY. If unsure, omit it.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "italian",
+                  "french",
+                  "nordic",
+                  "american",
+                  "mexican",
+                  "indian",
+                  "nepalese",
+                  "thai",
+                  "chinese",
+                  "japanese",
+                  "korean"
+                ]
+              }
+            },
+            "protein": {
+              "type": "array",
+              "title": "Protein tags",
+              "description": "Standardized protein tags inferred from the dish name, description, allergens and restaurant-specific labels. Choose zero or more values ONLY from the enum. If a concept is present in the text but no matching enum value exists, DO NOT add any tag for it. Never invent new tags, synonyms, or variations. If unsure, omit the tag.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "beef",
+                  "pork",
+                  "chicken",
+                  "fish",
+                  "seafood",
+                  "lamb",
+                  "tofu",
+                  "halloumi",
+                  "falafel",
+                  "legumes",
+                  "game"
+                ]
+              }
+            }
+          },
+          "required": ["diet", "allergen", "dishType", "cuisine", "protein"]
         }
       },
       "required": ["name", "description", "price", "tags"]

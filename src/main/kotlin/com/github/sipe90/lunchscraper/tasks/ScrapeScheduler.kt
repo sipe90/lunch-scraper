@@ -31,6 +31,15 @@ class ScrapeScheduler(
         scheduler.pause()
     }
 
+    fun startOrResume(schedule: String) {
+        if (scheduler.isRunning()) {
+            updateSchedule(schedule)
+            scheduler.resume()
+        } else {
+            start(schedule)
+        }
+    }
+
     fun resume() {
         logger.info { "Resuming scheduler" }
         scheduler.resume()

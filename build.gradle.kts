@@ -83,8 +83,8 @@ dependencies {
     implementation(libs.logback.classic)
 
     // Test
+    testImplementation(libs.bundles.junit)
     testImplementation(libs.ktor.server.test.host)
-    testImplementation(libs.kotlin.test.junit)
 }
 
 tasks.withType<LintTask> {
@@ -131,3 +131,7 @@ sourceSets.main.configure {
 
 tasks.getByName("compileKotlin").dependsOn("generateMenuExtractionModel")
 tasks.getByName("afterReleaseBuild").dependsOn("publishImage")
+
+tasks.test {
+    useJUnitPlatform()
+}

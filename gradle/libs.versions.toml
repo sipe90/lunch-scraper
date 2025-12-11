@@ -3,6 +3,7 @@ kotlin = "2.2.21"
 ktor = "3.3.0"
 logback = "1.5.21"
 mongo = "5.6.1"
+junit = "5.11.2"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -20,7 +21,10 @@ mongodb-driver-kotlin-coroutine = { module = "org.mongodb:mongodb-driver-kotlin-
 bson = { module = "org.mongodb:bson", version.ref = "mongo" }
 bson-kotlinx = { module = "org.mongodb:bson-kotlinx", version.ref = "mongo" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1" }
 kt-scheduler = { module = "com.github.Pool-Of-Tears:KtScheduler", version = "1.1.6" }
 cron-utils = { module = "com.cronutils:cron-utils", version = "9.2.1" }
@@ -35,3 +39,6 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 node = { id = "com.github.node-gradle.node", version = "7.1.0" }
 release = { id = "net.researchgate.release", version = "3.1.0" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "5.3.0" }
+
+[bundles]
+junit = [ "junit-api", "junit-engine", "junit-launcher" ]

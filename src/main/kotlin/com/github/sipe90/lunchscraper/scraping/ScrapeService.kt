@@ -97,6 +97,7 @@ class ScrapeService(
             val params =
                 ScrapeParameters(
                     name = restaurant.name,
+                    hint = restaurant.parameters.hint ?: "",
                 )
 
             val scraper = LoaderFactory.create(restaurant.parameters)
